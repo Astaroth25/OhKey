@@ -1,0 +1,96 @@
+---
+// Intro de entrada: cortina de formas SVG que cubre la pantalla y se
+// retira con un borde ondulado al cargar la página, revelando el
+// fondo interactivo y el slider. Motor portado literal desde la demo
+// de Blake Bowen (https://codepen.io/osublake/pen/BYwgBg, técnica
+// "Dynamic Shape Overlays with SVG" de Codrops + gradientes GSAP):
+// mismos puntos/duraciones/desfases y timeline de GSAP tweando los
+// valores directamente. Solo cambia la paleta (la del proyecto) y que
+// aquí es de un solo uso -al cargar- en vez de un toggle abrir/cerrar
+// al clic: se auto-elimina del DOM al terminar la animación.
+---
+
+<svg class="shape-overlays" viewBox="0 0 100 100" preserveAspectRatio="none">
+	<defs>
+		<!-- capa frontal: se retira primero -->
+		<linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+			<stop offset="0%" stop-color="#7f57ff" />
+			<stop offset="100%" stop-color="#1d194c" />
+		</linearGradient>
+		<!-- capa trasera: se retira 0.25s después, breve destello más claro -->
+		<linearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+			<stop offset="0%" stop-color="#a9b2ff" />
+			<stop offset="100%" stop-color="#303099" />
+		</linearGradient>
+	</defs>
+	<path class="shape-overlays__path" fill="url(#gradient2)"></path>
+	<path class="shape-overlays__path" fill="url(#gradient1)"></path>
+</svg>
+
+<style>
+	.shape-overlays {
+		width: 100%;
+		height: 100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 50;
+		cursor: pointer;
+	}
+</style>
+
+<script>
+	import gsap from 'gsap';
+
+	const svgEl = document.querySelector<SVGSVGElement>('.shape-overlays');
+
+	if (svgEl) {
+		const paths = Array.from(svgEl.querySelectorAll<SVGPathElement>('.shape-overlays__path'));
+
+		const numPoints = 10;
+		const numPaths = paths.length;
+		const delayPointsMax = 0.3;
+		const delayPerPath = 0.25;
+		const duration = 0.9;
+
+		// Un valor por punto de control, por capa. Todos parten a 100
+		// (cubren la pantalla entera) y se animan a 0 (la retiran).
+		const allPoints: number[][] = paths.map(() => Array(numPoints).fill(100));
+
+		function render(): void {
+			paths.forEach((path, i) => {
+				const points = allPoints[i];
+				let d = `M 0 ${points[0]} C`;
+
+				for (let j = 0; j < numPoints - 1; j++) {
+					const p = ((j + 1) / (numPoints - 1)) * 100;
+					const cp = p - ((1 / (numPoints - 1)) * 100) / 2;
+					d += ` ${cp} ${points[j]} ${cp} ${points[j + 1]} ${p} ${points[j + 1]}`;
+				}
+
+				d += ' V 0 H 0';
+				path.setAttribute('d', d);
+			});
+		}
+
+		const tl = gsap.timeline({
+			onUpdate: render,
+			onComplete: () => svgEl.remove(),
+			defaults: { ease: 'power2.inOut', duration },
+		});
+
+		// Un desfase por punto (compartido entre capas) más un desfase
+		// por capa: la capa frontal (i=0) empieza sin retraso y cada
+		// capa siguiente arranca "delayPerPath" más tarde.
+		const pointsDelay = Array.from({ length: numPoints }, () => Math.random() * delayPointsMax);
+
+		for (let i = 0; i < numPaths; i++) {
+			const points = allPoints[i];
+			const pathDelay = delayPerPath * (numPaths - i - 1);
+
+			for (let j = 0; j < numPoints; j++) {
+				tl.to(points, { [j]: 0 }, pointsDelay[j] + pathDelay);
+			}
+		}
+	}
+</script>

@@ -1,0 +1,965 @@
+---
+// Hero interactivo con tarjetas arrastrables, adaptado de la plantilla
+// de Webflow "GSAP Draggable Website Template":
+// https://webflow.com/templates/html/gsap-draggable-website-template
+// (demo real: https://webflow-and-gsap.webflow.io/).
+//
+// Reconstruido con GSAP Draggable + InertiaPlugin y un cursor
+// personalizado con 3 estados (default / hover / grab), igual que el
+// original. Las 6 fotos/video de la plantilla son assets de terceros y
+// no se reutilizan: se reemplazan por tarjetas de color con la paleta
+// del proyecto, listas para tus propias imágenes.
+//
+// El titular es una composición a medida (ver /public/diapositiva_2.svg
+// y el bloque de comentarios junto al <h2> más abajo), calcada de la
+// misma técnica del <h1> de la diapositiva 1 en index.astro: SVG con
+// "textLength" para que cada palabra rellene su columna exacta, más una
+// columna vertical de dos colores. Sus palabras llevan igualmente la
+// clase "palabra": el script del slider en index.astro las anima como
+// parte de la MISMA timeline de la transición, no esta diapositiva por
+// su cuenta.
+
+// Sin fotos propias todavía: cada tarjeta usa una imagen de referencia
+// (picsum.photos, con semilla fija para que no cambie en cada recarga) solo
+// para ver el layout con una foto completa. Sustituye "img" por la tuya
+// cuando la tengas; el resto de la tarjeta no depende de que sea un
+// placeholder.
+//
+// "tag"/"highlights"/"cta" alimentan el contenido del modal de información
+// (ver más abajo): cabecera con foto, etiqueta de categoría, 3 puntos
+// destacados y botón de acción, en vez del bloque de solo texto anterior.
+// "tagClass"/"ctaClass"/"iconClass" son clases de Tailwind completas (no
+// construidas por interpolación) para que el escáner de Tailwind las
+// detecte en este archivo: cada tarjeta trae su propio color de marca, con
+// texto oscuro en vez de blanco para "Resultados" (bg-brand-200, claro) y
+// un tono más claro que el fondo para el icono de "Cursos" (bg-brand-800,
+// demasiado oscuro para verse bien como simple trazo de 1.4px).
+const cards = [
+	{
+		modifier: 'is-first',
+		color: 'bg-brand-400',
+		img: 'https://picsum.photos/seed/ohkey-wappo/600/700',
+		title: 'Wappo CRM: Tu WhatsApp, potenciado.',
+		description:
+			'Centraliza tu atención al cliente. Gestiona conversaciones con múltiples agentes desde un solo número de WhatsApp Business: automatiza respuestas, lanza campañas y mide tus métricas clave sin que un mensaje se quede sin convertir.',
+		tag: 'Producto',
+		highlights: [
+			'Multiagente en un solo número de WhatsApp',
+			'Respuestas y campañas automatizadas',
+			'Métricas claras de cada conversación',
+		],
+		cta: 'Probar Wappo CRM',
+		tagClass: 'bg-brand-400 text-white',
+		ctaClass: 'bg-brand-400 text-white shadow-lg shadow-brand-400/30',
+		iconClass: 'text-brand-400',
+	},
+	{
+		modifier: 'is-second',
+		color: 'bg-brand-600',
+		img: 'https://picsum.photos/seed/ohkey-estrategia/600/700',
+		title: 'Asesoría estratégica',
+		description:
+			'¿Quieres mayor presencia digital y elevar tus ventas, pero no sabes por dónde empezar? Diseñamos estrategias a medida con objetivos claros: avance medible, precios transparentes y un asesor experto que sabe que cada dólar cuenta para tu crecimiento.',
+		tag: 'Asesoría',
+		highlights: [
+			'Estrategia de marketing a tu medida',
+			'Objetivos claros y avance medible',
+			'Precios transparentes, sin sorpresas',
+		],
+		cta: 'Agendar asesoría',
+		tagClass: 'bg-brand-600 text-white',
+		ctaClass: 'bg-brand-600 text-white shadow-lg shadow-brand-600/30',
+		iconClass: 'text-brand-600',
+	},
+	{
+		modifier: 'is-third',
+		color: 'bg-brand-800',
+		img: 'https://picsum.photos/seed/ohkey-cursos/600/700',
+		title: 'Cursos y formación',
+		description:
+			'Construye bases sólidas para dominar el entorno digital. Diseñado para emprendedores y estudiantes, nuestra plataforma te ofrece clases en vivo y pregrabadas: estrategias prácticas, aplicables desde el primer día en tu negocio o tu carrera.',
+		tag: 'Formación',
+		highlights: [
+			'Clases en vivo y pregrabadas',
+			'Estrategias aplicables desde el día 1',
+			'Pensado para emprendedores y estudiantes',
+		],
+		cta: 'Ver cursos disponibles',
+		tagClass: 'bg-brand-800 text-white',
+		ctaClass: 'bg-brand-800 text-white shadow-lg shadow-brand-800/40',
+		iconClass: 'text-brand-400',
+	},
+	{
+		modifier: 'is-fourth',
+		color: 'bg-brand-200',
+		img: 'https://picsum.photos/seed/ohkey-resultados/600/700',
+		title: 'Resultados que hablan por sí solos',
+		description:
+			'No solo prometemos crecimiento, lo demostramos. Explora las historias de marcas y emprendedores que ya transformaron su presencia digital y aumentaron sus ventas trabajando de la mano con nosotros.',
+		tag: 'Casos de éxito',
+		highlights: [
+			'Marcas que ya transformamos con nosotros',
+			'Crecimiento medible, no promesas vacías',
+			'Historias reales de negocios en crecimiento',
+		],
+		cta: 'Ver casos de éxito',
+		tagClass: 'bg-brand-200 text-brand-950',
+		ctaClass: 'bg-brand-200 text-brand-950 shadow-lg shadow-brand-200/30',
+		iconClass: 'text-brand-200',
+	},
+	{
+		modifier: 'is-fifth',
+		color: 'bg-brand-950',
+		img: 'https://picsum.photos/seed/ohkey-comunidad/600/700',
+		title: 'Únete a la comunidad OhKey',
+		description:
+			'El marketing digital cambia todos los días y queremos mantenerte un paso adelante. Síguenos en nuestras redes sociales para recibir tips, noticias y estrategias que puedes aplicar hoy mismo. ¡Ayúdanos a seguir haciendo crecer esta comunidad!',
+		tag: 'Comunidad',
+		highlights: [
+			'Tips y noticias para ir un paso adelante',
+			'Estrategias que puedes aplicar hoy mismo',
+			'Una comunidad que crece contigo',
+		],
+		cta: 'Unirme a la comunidad',
+		tagClass: 'bg-brand-950 text-white',
+		ctaClass: 'bg-brand-950 text-white shadow-lg shadow-brand-950/50',
+		iconClass: 'text-brand-400',
+	},
+];
+---
+
+<div class="hero-home relative flex h-full w-full items-center justify-center overflow-hidden" data-hero-home>
+	<!--
+		"w-full" es necesario, no cosmético: sin un ancho DEFINIDO aquí, este
+		div (flex, sin más ancho que el tope "max-w-xl") no tiene de dónde
+		sacar el "w-full" en % que lleva el <h2> de dentro -y todo el título
+		colapsaba a 0x0-. "w-full" fija ese ancho al 100% de "hero-home" (que
+		si es definido, viene del tamaño real de la diapositiva).
+	-->
+	<div class="hero-heading relative z-0 flex w-full max-w-xl flex-col items-center gap-6 px-6 text-center">
+		<!--
+			Composición a medida (ver /public/diapositiva_2.svg): misma técnica
+			que el <h1> de la diapositiva 1 -grid de 2 columnas, SVG con
+			textLength="100%" para que cada palabra rellene su columna exacta
+			sin calibrar nada por fuente, columna vertical de dos colores para
+			"Diseñadas Para"-. "Soluciones" → "Tu" → "Escalar" van en flujo
+			normal, con el MISMO "mt-[5%]" entre cada una: la misma
+			separación a los dos lados de "Tu". "gap-x-[3%]" en el <h2>
+			separa ese bloque completo de la columna de "Diseñadas Para"
+			-ajustado a ojo-.
+
+			"negocio" (cursiva, Google Font "Kaushan Script" -la más
+			parecida a la fuente original de la referencia, "Amsterdam", que
+			era de licencia solo personal-) NO cuenta como espacio en ese flujo: va
+			con "position: absolute" dentro del envoltorio "relative" de
+			"Tu", así que ese flujo -y el "mt-[5%]" de "Escalar"- se calcula
+			como si "negocio" no existiera, e "negocio" simplemente se pinta
+			encima, un poco por debajo del propio "Tu" ("top-[47%]", medido a
+			mano sobre la referencia: el punto donde empieza "negocio" cae al
+			47% de la altura de "Tu"). Necesita "z-index" propio ("z-10")
+			porque, aunque va antes que "Escalar" en el DOM, "Escalar" no
+			está posicionado (no tiene "position") y pintaba por encima de
+			cualquier hijo "absolute" de un envoltorio anterior sin ese
+			empujón explícito.
+
+			Las 6 piezas ("[data-titulo-parte]") tienen su propia coreografía
+			de entrada más abajo (ver "playTituloIntro" en el <script>),
+			igual que el <h1> de la diapositiva 1: quedan excluidas del
+			fundido genérico por palabra del slider ("[data-titulo-parte]"
+			de nuevo, ver el selector en index.astro), no lo usan.
+		-->
+		<h2 class="grid w-full grid-cols-[1fr_auto] items-stretch gap-x-[3%] [container-type:inline-size]">
+			<div class="col-start-1 flex flex-col [container-type:inline-size]">
+				<svg
+					class="palabra block h-auto w-full overflow-visible text-white"
+					viewBox="0 344 6549 735"
+					preserveAspectRatio="none"
+					data-titulo-parte="soluciones"
+				>
+					<text x="0" y="1069" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" font-weight="900" class="fill-current"
+						>SOLUCIONES</text
+					>
+				</svg>
+
+				<div class="relative mt-[5%]">
+					<svg
+						class="palabra text-brand-600 block h-auto w-full overflow-visible"
+						viewBox="0 355 1348 724"
+						preserveAspectRatio="none"
+						data-titulo-parte="tu"
+					>
+						<text x="0" y="1069" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" font-weight="900" class="fill-current"
+							>TU</text
+						>
+					</svg>
+
+					<svg
+						class="palabra absolute top-[47%] left-0 z-10 block h-auto w-full overflow-visible text-lime-400 [font-family:'Kaushan_Script',cursive]"
+						viewBox="0 401 2981 1050"
+						preserveAspectRatio="none"
+						data-titulo-parte="negocio"
+					>
+						<text x="0" y="1084" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" class="fill-current"
+							>negocio</text
+						>
+					</svg>
+				</div>
+
+				<svg
+					class="palabra text-brand-200 mt-[5%] block h-auto w-full overflow-visible"
+					viewBox="0 345 4498 734"
+					preserveAspectRatio="none"
+					data-titulo-parte="escalar"
+				>
+					<text x="0" y="1069" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" font-weight="900" class="fill-current"
+						>ESCALAR</text
+					>
+				</svg>
+			</div>
+
+			<!--
+				El ancho de esta columna ("Diseñadas Para" en vertical) no puede
+				ser un valor fijo (antes era "w-8 sm:w-10", como en el "Digital"
+				de la diapositiva 1): el grosor real del texto ya girado sale de
+				multiplicar el alto de la columna por el aspect-ratio de SU
+				propio viewBox (943/9040 aquí), y esa frase es más larga y con
+				una "Ñ" con tilde -que infla el alto del viewBox-, así que ese
+				grosor no encajaba en un ancho pensado para "Digital" (7 letras,
+				sin tilde): se recortaba por los lados con el "overflow-hidden"
+				de aquí. "w-[9cqw]" (9% del ancho del <h2>, ver su propio
+				"[container-type:inline-size]") lo resuelve para cualquier
+				frase: crece o encoge junto con el resto del título en vez de
+				ser un número adivinado a mano.
+
+				"Diseñadas" y "Para" son ahora 2 piezas independientes -cada
+				una su propio "data-titulo-parte", con su propia entrada en
+				"playTituloIntro"-, no una sola pieza con 2 palabras dentro.
+				Van en una fila flex (eje principal = ancho, el que "rotate-90"
+				convierte en el eje vertical ya girado) en vez del truco de
+				"tspan" + "dx" que usaba el bloque único: "gap-[5%]" reproduce
+				el mismo hueco que antes daba el "dx" (452/9040 = 5% del
+				"viewBox" completo -misma proporción que "mt-[5%]" en la
+				columna principal-, ahora resuelto contra un eje principal de
+				tamaño definido, "w-[100cqh]", así que el % de "gap" sí puede
+				calcularse). "grow-[N]" en cada SVG usa el MISMO número que su
+				"viewBox" (5866 y 2723, el ancho natural de cada palabra medido
+				en pantalla, repartido para sumar el 8588 restante tras
+				descontar ese 5% de hueco): con la misma proporción en ambos
+				sitios, el ancho que le toca a cada SVG en la fila y el ancho
+				de SU viewBox quedan en la misma escala, así que el alto
+				automático ("h-auto", el mismo truco que el resto de piezas
+				del titular) sale idéntico en las 2 sin tener que fijarlo a
+				mano. "min-w-0" es necesario en los 2 SVG: por defecto un
+				hijo flex no encoge por debajo de su "min-content", y al ser
+				un elemento reemplazado con aspect-ratio (el <svg> con
+				viewBox), ese mínimo automático se calcula a partir de ESE
+				aspect-ratio -no de "basis-0"-, así que sin "min-w-0" los 2
+				SVG ignoraban "grow" y ocupaban cada uno el 100% de la fila.
+			-->
+			<div class="col-start-2 relative w-[9cqw] overflow-hidden [container-type:size]">
+				<div
+					class="absolute top-1/2 left-1/2 flex w-[100cqh] -translate-x-1/2 -translate-y-1/2 items-end gap-[5%] rotate-90 overflow-visible"
+				>
+					<svg
+						class="palabra block h-auto min-w-0 grow-[5866] basis-0 overflow-visible text-brand-200"
+						viewBox="0 136 5866 943"
+						preserveAspectRatio="none"
+						data-titulo-parte="diseñadas"
+					>
+						<text x="0" y="1069" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" font-weight="900" class="fill-current"
+							>DISEÑADAS</text
+						>
+					</svg>
+					<svg
+						class="palabra block h-auto min-w-0 grow-[2723] basis-0 overflow-visible text-white"
+						viewBox="0 136 2723 943"
+						preserveAspectRatio="none"
+						data-titulo-parte="para"
+					>
+						<text x="0" y="1069" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" font-weight="900" class="fill-current"
+							>PARA</text
+						>
+					</svg>
+				</div>
+			</div>
+		</h2>
+	</div>
+
+	<!--
+		"is-first" (Wappo CRM) es la única tarjeta con el aviso de "ver
+		detalles" (más abajo, dentro de este mismo ".map"): es la de arriba
+		del stack y, por el orden invertido con el que "revealCards" anima el
+		array (ver el bloque de comentarios junto a esa función más abajo),
+		la ÚLTIMA en terminar de entrar. Arranca en "opacity-0" -"gsap.set" la
+		reafirma en cada visita a la diapositiva, igual que "cards"/
+		"dragHint"- y la muestra "showLastCardNote", llamada desde el
+		"onComplete" de "revealCards", así que sale justo al terminar esa
+		animación, no antes. Los 2 SVG de icono son fijos -clic para mouse
+		fino, ondas para pantalla táctil-: el script solo oculta el que no
+		aplica y cambia el texto, sin tocar el "path"/"circle" del que se
+		queda.
+	-->
+	{
+		cards.map((card) => (
+			<div
+				class:list={['draggable-card', card.modifier, card.color]}
+				data-draggable-card
+				data-card-title={card.title}
+				data-card-description={card.description}
+				data-card-img={card.img}
+				data-card-tag={card.tag}
+				data-card-tag-class={card.tagClass}
+				data-card-cta={card.cta}
+				data-card-cta-class={card.ctaClass}
+				data-card-icon-class={card.iconClass}
+				data-card-highlights={JSON.stringify(card.highlights)}
+				role="button"
+				tabindex="0"
+				aria-haspopup="dialog"
+			>
+				<img
+					src={card.img}
+					alt=""
+					class="pointer-events-none absolute inset-0 h-full w-full object-cover"
+					loading="lazy"
+				/>
+				<div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+				<span class="pointer-events-none absolute right-0 bottom-0 left-0 px-4 pb-4 text-center text-xs font-semibold tracking-widest text-white uppercase">
+					{card.title}
+				</span>
+				{card.modifier === 'is-first' && (
+					<div
+						class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/75 px-6 text-center text-white opacity-0"
+						data-card-note
+					>
+						<svg
+							class="h-6 w-6 sm:h-7 sm:w-7"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.6"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+							data-card-note-icon-fine
+						>
+							<path d="M5.2 3.4l14.1 6.1-6.1 2.2-2.2 6.1-5.8-14.4z" />
+						</svg>
+						<svg
+							class="hidden h-6 w-6 sm:h-7 sm:w-7"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.6"
+							aria-hidden="true"
+							data-card-note-icon-coarse
+						>
+							<circle cx="12" cy="12" r="2.1" fill="currentColor" stroke="none" />
+							<circle cx="12" cy="12" r="6.2" opacity="0.85" />
+							<circle cx="12" cy="12" r="9.8" opacity="0.45" />
+						</svg>
+						<span class="text-xs font-semibold leading-snug sm:text-sm" data-card-note-text>Click para ver los detalles</span>
+					</div>
+				)}
+			</div>
+		))
+	}
+
+	<!--
+		Modal de información de la tarjeta. Un único overlay reutilizado por
+		las 5 tarjetas: se rellena con el contenido de la que se tocó (foto,
+		etiqueta de categoría, título, descripción, 3 puntos destacados y
+		botón de acción) y se muestra a pantalla completa en móvil o como
+		cuadro grande con el fondo difuminado en pantallas más anchas.
+
+		El área de acción (".card-modal__cta-area" más abajo) es la MISMA
+		en los 2 tamaños -mismo <a>, mismo contenido-, solo cambia de
+		aspecto por CSS: barra fija con fondo y borde superior, ancho
+		completo, en móvil (mismo patrón que un "sticky footer" de app);
+		simple bloque sin fondo, ancho de su contenido, en escritorio -ver
+		el mockup de referencia-. Así no hace falta duplicar el botón ni
+		sincronizar 2 elementos por separado en el script de más abajo.
+	-->
+	<div
+		class="card-modal pointer-events-none fixed inset-0 z-[9999] flex items-center justify-center opacity-0"
+		data-card-modal
+		role="dialog"
+		aria-modal="true"
+		aria-hidden="true"
+		inert
+	>
+		<div class="card-modal__backdrop absolute inset-0 bg-black/60 backdrop-blur-md" data-card-modal-backdrop />
+		<div class="card-modal__panel relative flex w-full flex-col overflow-hidden bg-neutral-900 text-white shadow-2xl">
+			<!-- Cabecera visual: foto + etiqueta de categoría -->
+			<div class="relative h-64 w-full shrink-0 sm:h-[280px]">
+				<img
+					class="pointer-events-none absolute inset-0 h-full w-full object-cover"
+					data-card-modal-img
+					src=""
+					alt=""
+				/>
+				<div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/45 to-transparent"></div>
+				<div class="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-neutral-900 to-transparent"></div>
+
+				<button
+					type="button"
+					class="absolute top-5 right-5 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white transition-colors hover:bg-black/60"
+					data-card-modal-close
+					aria-label="Cerrar"
+				>
+					<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+						<path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+					</svg>
+				</button>
+
+				<span
+					class="absolute bottom-5 left-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-bold tracking-widest uppercase"
+					data-card-modal-tag
+				></span>
+			</div>
+
+			<!-- Título, descripción y puntos destacados (columna con scroll propio si el contenido no cabe) -->
+			<div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 pt-6 pb-6 sm:px-8">
+				<h3 class="text-2xl font-extrabold sm:text-[28px]" data-card-modal-title></h3>
+				<p class="text-sm leading-relaxed text-white/70 sm:text-[15px]" data-card-modal-description></p>
+
+				<ul class="flex flex-col gap-2.5">
+					<li class="flex items-start gap-2.5">
+						<svg
+							class="mt-px h-[18px] w-[18px] shrink-0"
+							viewBox="0 0 20 20"
+							fill="none"
+							aria-hidden="true"
+							data-card-modal-highlight-icon
+						>
+							<circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.4" />
+							<path d="M6 10.2l2.4 2.4L14 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+						<span class="text-[13px] leading-snug text-white/85 sm:text-sm" data-card-modal-highlight-text></span>
+					</li>
+					<li class="flex items-start gap-2.5">
+						<svg
+							class="mt-px h-[18px] w-[18px] shrink-0"
+							viewBox="0 0 20 20"
+							fill="none"
+							aria-hidden="true"
+							data-card-modal-highlight-icon
+						>
+							<circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.4" />
+							<path d="M6 10.2l2.4 2.4L14 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+						<span class="text-[13px] leading-snug text-white/85 sm:text-sm" data-card-modal-highlight-text></span>
+					</li>
+					<li class="flex items-start gap-2.5">
+						<svg
+							class="mt-px h-[18px] w-[18px] shrink-0"
+							viewBox="0 0 20 20"
+							fill="none"
+							aria-hidden="true"
+							data-card-modal-highlight-icon
+						>
+							<circle cx="10" cy="10" r="9" stroke="currentColor" stroke-width="1.4" />
+							<path d="M6 10.2l2.4 2.4L14 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+						</svg>
+						<span class="text-[13px] leading-snug text-white/85 sm:text-sm" data-card-modal-highlight-text></span>
+					</li>
+				</ul>
+			</div>
+
+			<!-- Botón de acción: barra fija en móvil, bloque simple en escritorio (ver comentario de arriba) -->
+			<div
+				class="card-modal__cta-area shrink-0 border-t border-white/10 bg-neutral-900/95 px-6 py-4 backdrop-blur sm:border-t-0 sm:bg-transparent sm:px-8 sm:pt-0 sm:pb-8 sm:backdrop-blur-none"
+			>
+				<a
+					href="#"
+					class="flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[13px] font-bold tracking-wide uppercase sm:w-auto sm:justify-start sm:px-7"
+					data-card-modal-cta
+				></a>
+			</div>
+		</div>
+	</div>
+
+	<!--
+		Antes solo existía en móvil ("md:hidden" + "dragHint?.remove()" en
+		el cursor personalizado de más abajo, que la quitaba del todo en
+		escritorio). Ahora se ve en los 2 tamaños.
+	-->
+	<button
+		type="button"
+		class="drag-hint absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full bg-white/10 px-4 py-2 text-xs tracking-widest text-white/70 uppercase backdrop-blur"
+	>
+		Arrastra las tarjetas
+	</button>
+
+	<div class="cursor-fixed pointer-events-none fixed inset-0 z-[999] hidden opacity-0 md:block" data-cursor>
+		<div
+			class="absolute top-0 left-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0"
+			data-cursor-default
+		>
+		</div>
+		<div
+			class="absolute top-0 left-0 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 opacity-0"
+			data-cursor-hover
+		>
+		</div>
+		<div
+			class="bg-brand-400 absolute top-0 left-0 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-[10px] font-semibold tracking-widest text-white uppercase opacity-0"
+			data-cursor-grab
+		>
+			Suelta
+		</div>
+	</div>
+</div>
+
+<style>
+	.draggable-card {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 12rem;
+		height: 13rem;
+		border-radius: 0.75rem;
+		overflow: hidden;
+		box-shadow: 0 1rem 2rem rgb(0 0 0 / 0.35);
+	}
+
+	@media (min-width: 640px) {
+		.draggable-card {
+			width: 18rem;
+			height: 19rem;
+		}
+	}
+
+	.draggable-card.is-first {
+		z-index: 7;
+		transform: rotate(-6deg);
+	}
+
+	.draggable-card.is-second {
+		z-index: 6;
+		transform: rotate(0.64deg);
+	}
+
+	.draggable-card.is-third {
+		z-index: 5;
+		transform: rotate(-2.5deg);
+	}
+
+	.draggable-card.is-fourth {
+		z-index: 4;
+	}
+
+	.draggable-card.is-fifth {
+		z-index: 3;
+		transform: rotate(2deg);
+	}
+
+	.draggable-card.is-sixth {
+		z-index: 2;
+		transform: rotate(-6deg);
+	}
+
+	.draggable-card {
+		cursor: pointer;
+	}
+
+	/*
+		.hero-home pone "cursor: none" en línea para dejar sitio al cursor
+		personalizado (ver <script> abajo). El modal es descendiente suyo, así
+		que sin esto heredaba ese "none" y el clic sobre una tarjeta dejaba la
+		pantalla sin ningún cursor visible: ni el nativo ni el personalizado,
+		que además queda tapado detrás del modal (z-index más alto).
+	*/
+	.card-modal {
+		cursor: auto;
+	}
+
+	/* Móvil: el cuadro de información ocupa toda la pantalla. */
+	.card-modal__panel {
+		height: 100%;
+		border-radius: 0;
+	}
+
+	@media (min-width: 640px) {
+		/* PC/tablet: cuadro grande centrado, con el resto de la pantalla
+		   difuminado por el backdrop (.card-modal__backdrop). */
+		.card-modal__panel {
+			height: auto;
+			max-height: 85vh;
+			width: 100%;
+			max-width: 32rem;
+			border-radius: 1.5rem;
+		}
+	}
+</style>
+
+<script>
+	import gsap from 'gsap';
+	import { Draggable } from 'gsap/Draggable';
+	import { InertiaPlugin } from 'gsap/InertiaPlugin';
+
+	gsap.registerPlugin(Draggable, InertiaPlugin);
+
+	const heroHome = document.querySelector<HTMLElement>('[data-hero-home]');
+
+	if (heroHome) {
+		const cards = Array.from(heroHome.querySelectorAll<HTMLElement>('[data-draggable-card]'));
+		const cursor = heroHome.querySelector<HTMLElement>('[data-cursor]');
+		const cursorDefault = heroHome.querySelector<HTMLElement>('[data-cursor-default]');
+		const cursorHover = heroHome.querySelector<HTMLElement>('[data-cursor-hover]');
+		const cursorGrab = heroHome.querySelector<HTMLElement>('[data-cursor-grab]');
+		const dragHint = heroHome.querySelector<HTMLElement>('.drag-hint');
+
+		const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+		const canUseCursor = hasFinePointer && cursor && cursorDefault && cursorHover && cursorGrab;
+
+		// Aviso de "ver detalles" de la última tarjeta en entrar (ver el
+		// comentario junto a "data-card-note" en el marcado de arriba y
+		// "showLastCardNote" más abajo). El texto por defecto en el marcado
+		// ("Click para ver los detalles") ya sirve para mouse fino: en
+		// pantalla táctil solo hace falta cambiar el texto y qué icono
+		// queda oculto, no reconstruir el elemento.
+		const lastCardNote = heroHome.querySelector<HTMLElement>('[data-card-note]');
+		const lastCardNoteText = lastCardNote?.querySelector<HTMLElement>('[data-card-note-text]');
+		const lastCardNoteIconCoarse = lastCardNote?.querySelector<SVGElement>('[data-card-note-icon-coarse]');
+		if (lastCardNoteText && !hasFinePointer) {
+			lastCardNoteText.textContent = 'Toca para ver los detalles';
+			lastCardNote?.querySelector('[data-card-note-icon-fine]')?.classList.add('hidden');
+			lastCardNoteIconCoarse?.classList.remove('hidden');
+		}
+
+		// Modal de información: pantalla completa en móvil, cuadro grande
+		// con el resto difuminado en pantallas anchas (ver <style> arriba).
+		// Se reutiliza un único overlay para las 5 tarjetas.
+		const modal = heroHome.querySelector<HTMLElement>('[data-card-modal]');
+		const modalPanel = modal?.querySelector<HTMLElement>('.card-modal__panel');
+		const modalBackdrop = modal?.querySelector<HTMLElement>('[data-card-modal-backdrop]');
+		const modalClose = modal?.querySelector<HTMLElement>('[data-card-modal-close]');
+		const modalImg = modal?.querySelector<HTMLImageElement>('[data-card-modal-img]');
+		const modalTag = modal?.querySelector<HTMLElement>('[data-card-modal-tag]');
+		const modalTitle = modal?.querySelector<HTMLElement>('[data-card-modal-title]');
+		const modalDescription = modal?.querySelector<HTMLElement>('[data-card-modal-description]');
+		const modalHighlightTexts = modal
+			? gsap.utils.toArray<HTMLElement>('[data-card-modal-highlight-text]', modal)
+			: [];
+		const modalHighlightIcons = modal
+			? gsap.utils.toArray<SVGElement>('[data-card-modal-highlight-icon]', modal)
+			: [];
+		const modalCta = modal?.querySelector<HTMLAnchorElement>('[data-card-modal-cta]');
+
+		// Clases de color que SÍ cambian por tarjeta (ver "tagClass"/"ctaClass"/
+		// "iconClass" en el array "cards" de más arriba): el resto de clases de
+		// la etiqueta/botón/icono son fijas y viven en el marcado, así que aquí
+		// solo hace falta reemplazar el color en cada apertura.
+		const modalTagBaseClass = modalTag?.className ?? '';
+		const modalCtaBaseClass = modalCta?.className ?? '';
+		const modalIconBaseClass = modalHighlightIcons[0]?.getAttribute('class') ?? '';
+
+		let modalOpen = false;
+
+		// Tarjeta que abrió el modal actualmente visible: hace falta para
+		// poder "encogerlo" de vuelta a su sitio al cerrar (ver "morph" más
+		// abajo). Puede haberse arrastrado mientras tanto -aunque con el
+		// modal abierto no se puede-, así que su posición se vuelve a medir
+		// en cada apertura/cierre, nunca se guarda como un valor fijo.
+		let activeCard: HTMLElement | null = null;
+
+		function openCardModal(card: HTMLElement): void {
+			if (!modal || !modalPanel || !modalBackdrop || !modalTitle || !modalDescription || !modalImg || !modalTag || !modalCta)
+				return;
+
+			modalTitle.textContent = card.dataset.cardTitle ?? '';
+			modalDescription.textContent = card.dataset.cardDescription ?? '';
+			modalImg.src = card.dataset.cardImg ?? '';
+
+			modalTag.textContent = card.dataset.cardTag ?? '';
+			modalTag.className = `${modalTagBaseClass} ${card.dataset.cardTagClass ?? ''}`.trim();
+
+			modalCta.textContent = card.dataset.cardCta ?? '';
+			modalCta.className = `${modalCtaBaseClass} ${card.dataset.cardCtaClass ?? ''}`.trim();
+
+			const highlights: string[] = card.dataset.cardHighlights ? JSON.parse(card.dataset.cardHighlights) : [];
+			modalHighlightTexts.forEach((el, i) => {
+				el.textContent = highlights[i] ?? '';
+			});
+			modalHighlightIcons.forEach((el) => {
+				el.setAttribute('class', `${modalIconBaseClass} ${card.dataset.cardIconClass ?? ''}`.trim());
+			});
+
+			activeCard = card;
+			modalOpen = true;
+			modal.style.pointerEvents = 'auto';
+			modal.setAttribute('aria-hidden', 'false');
+			modal.removeAttribute('inert');
+			document.body.classList.add('modal-open');
+
+			gsap.killTweensOf([modal, modalPanel, modalBackdrop]);
+			gsap.set(modal, { autoAlpha: 1 });
+
+			// "Morph" desde la tarjeta pulsada (técnica FLIP): el panel
+			// arranca con el tamaño y la posición EXACTOS de la tarjeta y
+			// crece hasta su sitio final, en vez de aparecer ya centrado de
+			// golpe. ".card-modal" solo se oculta con "opacity-0" (nunca
+			// "display:none"/"visibility:hidden"), así que el panel ya está
+			// maquetado en su posición final -escritorio centrado o móvil a
+			// pantalla completa- y se puede medir con "getBoundingClientRect"
+			// sin mostrarlo primero.
+			const cardRect = card.getBoundingClientRect();
+			const panelRect = modalPanel.getBoundingClientRect();
+			const scaleX = cardRect.width / panelRect.width;
+			const scaleY = cardRect.height / panelRect.height;
+			const x = cardRect.left + cardRect.width / 2 - (panelRect.left + panelRect.width / 2);
+			const y = cardRect.top + cardRect.height / 2 - (panelRect.top + panelRect.height / 2);
+
+			gsap.fromTo(
+				modalPanel,
+				{ x, y, scaleX, scaleY, autoAlpha: 0 },
+				{ x: 0, y: 0, scaleX: 1, scaleY: 1, autoAlpha: 1, duration: 0.5, ease: 'back.out(1.4)' },
+			);
+			gsap.fromTo(modalBackdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' });
+		}
+
+		function closeCardModal(): void {
+			if (!modal || !modalPanel || !modalBackdrop) return;
+
+			modalOpen = false;
+			document.body.classList.remove('modal-open');
+
+			gsap.killTweensOf([modal, modalPanel, modalBackdrop]);
+			gsap.to(modalBackdrop, { autoAlpha: 0, duration: 0.3, ease: 'power2.in' });
+
+			const onClosed = (): void => {
+				if (!modal || !modalPanel) return;
+
+				// El botón de cerrar (u otro control de dentro) puede seguir
+				// teniendo el foco en este punto -es lo normal, nadie lo ha
+				// movido durante la animación-. Si se marca el modal
+				// "aria-hidden"/"inert" con el foco todavía dentro, el
+				// navegador lo bloquea y avisa por consola (elemento oculto
+				// que retiene el foco, mal para lectores de pantalla). Se
+				// devuelve el foco a la tarjeta que abrió el modal, el
+				// patrón habitual al cerrar un diálogo.
+				if (modal.contains(document.activeElement)) {
+					activeCard?.focus();
+				}
+
+				modal.style.pointerEvents = 'none';
+				modal.setAttribute('aria-hidden', 'true');
+				modal.setAttribute('inert', '');
+				gsap.set(modal, { autoAlpha: 0 });
+				gsap.set(modalPanel, { clearProps: 'transform,opacity,visibility' });
+				activeCard = null;
+			};
+
+			// Misma técnica FLIP que al abrir, mirando al revés: se encoge
+			// de vuelta al tamaño y la posición ACTUALES de la tarjeta que lo
+			// abrió. Si esa tarjeta ya no está disponible, se recurre al
+			// cierre simple (fundido + reducción centrada) de antes.
+			const cardRect = activeCard?.getBoundingClientRect();
+
+			if (cardRect) {
+				const panelRect = modalPanel.getBoundingClientRect();
+				const scaleX = cardRect.width / panelRect.width;
+				const scaleY = cardRect.height / panelRect.height;
+				const x = cardRect.left + cardRect.width / 2 - (panelRect.left + panelRect.width / 2);
+				const y = cardRect.top + cardRect.height / 2 - (panelRect.top + panelRect.height / 2);
+
+				gsap.to(modalPanel, { x, y, scaleX, scaleY, autoAlpha: 0, duration: 0.4, ease: 'power2.in', onComplete: onClosed });
+			} else {
+				gsap.to(modalPanel, { scale: 0.92, autoAlpha: 0, duration: 0.25, ease: 'power2.in', onComplete: onClosed });
+			}
+		}
+
+		modalBackdrop?.addEventListener('click', closeCardModal);
+		modalClose?.addEventListener('click', closeCardModal);
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && modalOpen) closeCardModal();
+		});
+
+		cards.forEach((card) => {
+			card.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					openCardModal(card);
+				}
+			});
+		});
+
+		function pointerXY(e: TouchEvent | PointerEvent): { x: number; y: number } | null {
+			if ('clientX' in e) return { x: e.clientX, y: e.clientY };
+			const touch = e.touches[0] ?? e.changedTouches[0];
+			return touch ? { x: touch.clientX, y: touch.clientY } : null;
+		}
+
+		if (canUseCursor && cursor && cursorDefault && cursorHover && cursorGrab) {
+			const showCursor = (type: 'default' | 'hover' | 'grab'): void => {
+				gsap.to(cursorDefault, { opacity: type === 'default' ? 1 : 0, duration: 0.2 });
+				gsap.to(cursorHover, { opacity: type === 'hover' ? 1 : 0, duration: 0.2 });
+				gsap.to(cursorGrab, { opacity: type === 'grab' ? 1 : 0, duration: 0.2 });
+			};
+
+			showCursor('default');
+			heroHome.style.cursor = 'none';
+			cards.forEach((card) => {
+				card.style.cursor = 'none';
+			});
+
+			heroHome.addEventListener('mousemove', (e) => {
+				gsap.set(cursor, { x: e.clientX, y: e.clientY });
+			});
+			heroHome.addEventListener('mouseenter', () => gsap.to(cursor, { opacity: 1, duration: 0.2 }));
+			heroHome.addEventListener('mouseleave', () => gsap.to(cursor, { opacity: 0, duration: 0.2 }));
+
+			cards.forEach((card) => {
+				card.addEventListener('mouseenter', () => showCursor('hover'));
+				card.addEventListener('mouseleave', () => showCursor('default'));
+			});
+
+			Draggable.create(cards, {
+				type: 'x,y',
+				edgeResistance: 0.65,
+				inertia: true,
+				bounds: heroHome,
+				onPress(this: Draggable) {
+					showCursor('grab');
+				},
+				onRelease(this: Draggable) {
+					showCursor('hover');
+				},
+				onDrag(this: Draggable) {
+					const point = pointerXY(this.pointerEvent);
+					if (point) gsap.set(cursor, { x: point.x, y: point.y });
+				},
+				onClick(this: Draggable) {
+					openCardModal(this.target as HTMLElement);
+				},
+			});
+		} else {
+			// Táctil: Draggable funciona igual, sin el cursor personalizado.
+			// "onClick" de Draggable distingue un toque de un arrastre real,
+			// así que abrir el modal aquí no interfiere con arrastrar la tarjeta.
+			Draggable.create(cards, {
+				type: 'x,y',
+				edgeResistance: 0.65,
+				inertia: true,
+				bounds: heroHome,
+				onClick(this: Draggable) {
+					openCardModal(this.target as HTMLElement);
+				},
+			});
+		}
+
+		// El titular ya no lo anima el fundido genérico por palabra del
+		// slider (ver "[data-titulo-parte]" en el <h2> de arriba, excluidas
+		// a propósito de ese mecanismo -misma técnica que el <h1> de la
+		// diapositiva 1 en index.astro-): entra con su propia coreografía,
+		// una pieza detrás de otra en el orden de la frase original
+		// ("Soluciones diseñadas para escalar tu negocio"): Soluciones,
+		// Diseñadas, Para, Escalar, Tu, negocio -no el orden visual en el que
+		// están dibujadas-, cada una desde un sitio distinto. Las tarjetas
+		// esperan 2s (delay) para dar tiempo
+		// a leer el titular antes de taparlo, y entran de una en una -sin
+		// solape entre una y la siguiente (stagger >= duration)-, no todas a
+		// la vez con las palabras del titular.
+		//
+		// El orden va invertido: la primera tarjeta (arriba del todo, mayor
+		// z-index) entra la ÚLTIMA, como si se repartiera la pila desde abajo.
+		//
+		// Sin bandera de "ya se reprodujo": esta diapositiva se puede visitar
+		// muchas veces, y cada visita tiene que entrar animada otra vez, no solo
+		// la primera. El punto de partida se fija con "gsap.set" antes de cada
+		// "gsap.to" para que arranque siempre desde cero.
+		//
+		// Separada en 2 funciones -antes era una sola, con un "delay" a mano
+		// calculado para que cayera más o menos cuando el titular terminaba de
+		// entrar- porque ese número se desincronizaba cada vez que cambiaba la
+		// duración del titular (como al añadir una pieza más a
+		// "playTituloIntro"). "hideCards" oculta las tarjetas de inmediato, al
+		// entrar en la diapositiva -para que no destellen visibles antes de
+		// tiempo-; "revealCards" las anima y la llama el propio timeline de
+		// "playTituloIntro" cuando termina, así que las tarjetas SIEMPRE entran
+		// justo después del titular, sin importar cuánto dure.
+		function hideCards(dFactor: 1 | -1): void {
+			gsap.set(cards, { autoAlpha: 0, yPercent: 120 * dFactor, scale: 0.85 });
+			// La píldora "Arrastra las tarjetas" espera a que las tarjetas
+			// terminen de entrar (ver "onComplete" en "revealCards"): sin
+			// esto se vería desde el principio, antes de que hubiera nada
+			// que arrastrar todavía.
+			if (dragHint) gsap.set(dragHint, { autoAlpha: 0, yPercent: 20 });
+			// Mismo motivo que "dragHint": sin resetear aquí, una segunda
+			// visita a la diapositiva la encontraría ya visible (o a medio
+			// desvanecer) en vez de arrancar oculta como la primera vez.
+			if (lastCardNote) gsap.set(lastCardNote, { autoAlpha: 0 });
+		}
+
+		// 0.25s de entrada + 1.5s ya bien visible + 0.25s de salida: los
+		// "1.5s" pedidos son el tiempo LEÍBLE del aviso, no el ciclo
+		// completo. El "delay" del segundo ".to" es lo que crea ese hueco
+		// fijo en el medio sin necesitar un tercer tween solo para esperar.
+		function showLastCardNote(): void {
+			if (!lastCardNote) return;
+
+			gsap
+				.timeline()
+				.to(lastCardNote, { autoAlpha: 1, duration: 0.25 })
+				.to(lastCardNote, { autoAlpha: 0, duration: 0.25, delay: 1.5 });
+		}
+
+		function revealCards(): void {
+			gsap.to([...cards].reverse(), {
+				autoAlpha: 1,
+				yPercent: 0,
+				scale: 1,
+				duration: 0.4,
+				ease: 'back.out(1.7)',
+				stagger: 0.4,
+				onComplete: () => {
+					if (dragHint) gsap.to(dragHint, { autoAlpha: 1, yPercent: 0, duration: 0.4, ease: 'power2.out' });
+					showLastCardNote();
+				},
+			});
+		}
+
+		const solucionesEl = heroHome.querySelector<SVGElement>('[data-titulo-parte="soluciones"]');
+		const tuEl = heroHome.querySelector<SVGElement>('[data-titulo-parte="tu"]');
+		const negocioEl = heroHome.querySelector<SVGElement>('[data-titulo-parte="negocio"]');
+		const escalarEl = heroHome.querySelector<SVGElement>('[data-titulo-parte="escalar"]');
+		const disenadasEl = heroHome.querySelector<SVGElement>('[data-titulo-parte="diseñadas"]');
+		const paraEl = heroHome.querySelector<SVGElement>('[data-titulo-parte="para"]');
+
+		// "delay: 0.5" -igual que en el <h1> de la diapositiva 1- espera a
+		// que el barrido de la diapositiva despeje pantalla antes de
+		// arrancar. Sin parámetro de posición en los ".to": cada uno se
+		// encadena al final del anterior, así que el orden en que se
+		// escriben es el orden en que se ven, sin solaparse.
+		function playTituloIntro(): void {
+			if (!solucionesEl || !tuEl || !negocioEl || !escalarEl || !disenadasEl || !paraEl) return;
+
+			gsap.set(solucionesEl, { autoAlpha: 0, xPercent: -60, rotation: -10 });
+			gsap.set(tuEl, { autoAlpha: 0, scale: 0.5 });
+			gsap.set(negocioEl, { autoAlpha: 0, scale: 0, rotation: -15 });
+			gsap.set(escalarEl, { autoAlpha: 0, xPercent: 60, rotation: 10 });
+			// Misma entrada que "tu negocio con" en la diapositiva 1 (ver
+			// "filaCentral" en index.astro): grupo con "autoAlpha"+"yPercent"+
+			// "scale" animado de una vez con "stagger", no 2 tweens seguidos.
+			gsap.set([disenadasEl, paraEl], { autoAlpha: 0, yPercent: 70, scale: 0.5 });
+
+			const tl = gsap.timeline({ delay: 0.5, defaults: { ease: 'back.out(1.7)' } });
+
+			tl.to(solucionesEl, { autoAlpha: 1, xPercent: 0, rotation: 0, duration: 0.45 })
+				.to([disenadasEl, paraEl], { autoAlpha: 1, yPercent: 0, scale: 1, duration: 0.35, stagger: 0.15 })
+				.to(escalarEl, { autoAlpha: 1, xPercent: 0, rotation: 0, duration: 0.45 })
+				.to(tuEl, { autoAlpha: 1, scale: 1, duration: 0.4 })
+				.to(negocioEl, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.4 })
+				.call(revealCards);
+		}
+
+		window.addEventListener('slide:enter', ((e: CustomEvent<{ index: number; direction: 1 | -1 }>) => {
+			if (e.detail.index === 1) {
+				hideCards(e.detail.direction);
+				playTituloIntro();
+			}
+		}) as EventListener);
+	}
+</script>

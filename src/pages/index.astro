@@ -1,0 +1,598 @@
+---
+import '../styles/global.css';
+import ShapeOverlays from '../components/ShapeOverlays.astro';
+import DraggableHero from '../components/DraggableHero.astro';
+---
+
+<html lang="es" class="h-full">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content="Entiende, aplica y domina el marketing digital." />
+		<title>OhKey Digital — Impulsa tu negocio</title>
+		<!--
+			"Kaushan Script": la cursiva de "negocio" en el titular de la
+			diapositiva 2 (ver DraggableHero.astro). Reemplaza a "Amsterdam"
+			-una fuente de descarga suelta que llegó a /public de licencia
+			"personal use only"-: esta es de Google Fonts, gratis para uso
+			comercial, y visualmente es la que más se le parece de las que
+			probé.
+		-->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap" rel="stylesheet" />
+	</head>
+	<body class="h-dvh w-dvw overflow-hidden overscroll-none bg-white">
+		<!--
+			Intro de entrada: cortina de shape-overlays con GSAP. Se ejecuta
+			una vez al cargar y se auto-elimina del DOM al terminar,
+			revelando el fondo interactivo y el slider.
+		-->
+		<ShapeOverlays />
+
+		<!--
+			Fondo interactivo (WebGL, canvas, partículas, etc.).
+			Vive detrás del slider (z-0) y no intercepta clics (pointer-events-none).
+			Monta aquí en el futuro un <canvas> o el script de tu librería WebGL.
+		-->
+		<div id="interactive-bg" class="fixed inset-0 z-0 pointer-events-none"></div>
+
+		<main id="slider" class="fixed inset-0 overflow-hidden bg-white text-white">
+			<!-- Diapositiva 1: Presentación -->
+			<section class="slide invisible fixed inset-0" data-slide-index="0">
+				<div class="slide__outer h-full w-full overflow-hidden">
+					<div class="slide__inner relative h-full w-full overflow-hidden">
+						<!--
+							El fondo opaco vive DENTRO de la ventana que barre la pantalla,
+							no en la sección exterior (que ya no se traslada, solo cambia
+							de opacidad de golpe). Si el fondo estuviera en la sección, al
+							pasar a visible taparía toda la pantalla de un salto, antes de
+							que el barrido tuviera ocasión de revelar nada.
+						-->
+						<!--
+							Mancha de color muy desenfocada (mismo "brand-400" del resto de la
+							paleta, no un color nuevo): rompe el lila plano de fondo sin
+							convertirse en un degradado agresivo. Vive dentro de ".slide__bg"
+							-la misma capa que ya se mueve con el parallax de la transición del
+							slider- para que se desplace junto al resto del fondo, no como un
+							elemento aparte.
+						-->
+						<div class="slide__bg absolute inset-0 z-0 overflow-hidden bg-brand-200">
+							<div class="absolute -top-[100px] -right-[110px] h-[320px] w-[320px] rounded-full bg-brand-400/35 blur-[70px] sm:-top-[140px] sm:-right-[120px] sm:h-[640px] sm:w-[640px] sm:blur-[90px]"></div>
+						</div>
+						<div class="relative z-10 flex h-full w-full items-center justify-center px-8">
+							<!--
+							"w-full" es necesario, no cosmético (ver el mismo fix en
+							DraggableHero.astro/".hero-heading"): sin un ancho DEFINIDO
+							aquí, el "w-full" en % del <h1> de dentro no tendría de dónde
+							sacar su ancho. Aquí "funcionaba" sin él porque el párrafo de
+							abajo, con texto normal, le daba de casualidad un ancho de
+							sobra al contenedor -misma trampa que hizo colapsar a 0x0 el
+							título de la diapositiva 2, que no tenía ese párrafo al lado-.
+						-->
+						<div class="flex w-full max-w-2xl flex-col items-center gap-6 text-center">
+								<!--
+									"Impulsa" y "Ohkey" van en SVG, no en <span> con clamp+cqw: por bien
+									calibrado que esté un ratio letra→ancho, depende de adivinar qué
+									fuente va a usar de verdad el navegador, y ese margen residual
+									-aunque sean un par de puntos- es justo el hueco que no queríamos.
+									"textLength" en SVG resuelve esto de raíz: el navegador estira o
+									comprime el propio texto (lengthAdjust="spacingAndGlyphs") para que
+									ocupe EXACTO el 100% del ancho del viewBox, sea cual sea la fuente
+									con la que termine renderizando -sin calibrar nada, sin margen
+									posible-. El alto sale solo (viewBox con el aspect-ratio real de
+									cada palabra, medido a mano con Pillow), así que el eje vertical
+									sigue sin tocarse.
+
+									"overflow-visible" en cada <svg> es necesario: el viewBox se
+									midió justo al borde de la tinta (sin margen, a propósito), pero
+									una letra redonda (la "O" de "Ohkey") suele tener un pelín de
+									"overshoot" óptico más allá de ese borde en la fuente real del
+									navegador -no en la que medí yo-. Sin "overflow-visible" (el valor
+									por defecto de <svg> es "hidden"), ese pelín se recorta y la curva
+									se ve plana/cortada en vez de redonda.
+
+									Van en mayúsculas literales ("IMPULSA"/"OHKEY") en vez de fiarse
+									del "uppercase" del <h1>: ese aspect-ratio se midió sobre las
+									mayúsculas, y el soporte de "text-transform" dentro de <svg> es
+									menos fiable entre navegadores -con una "p" o una "h" minúscula
+									real, la caja quedaría mal proporcionada (la "p" con descendente
+									asomando fuera del viewBox, por ejemplo).
+
+									"w-full" en el <h1> es clave: sin un ancho DEFINIDO (con "w-auto"
+									pasaba esto) la columna de texto se autodimensiona por su propio
+									contenido -una referencia circular-. Con "w-full" el ancho lo fija
+									el contenedor -"max-w-md" de aquí abajo, más angosto que el párrafo
+									de debajo a propósito para que el título salga más pequeño-, así
+									que nunca depende de cuánto midan las palabras que hay dentro.
+
+									"text-left" deshace el "text-center" heredado del contenedor padre
+									(pensado para el párrafo y el botón, que sí siguen centrados).
+
+									"Digital" usa el mismo truco de SVG+textLength, pero para llenar
+									el ALTO -no el ancho- de su columna y así coincidir exacto con la
+									A de "Impulsa" arriba y la Y de "Ohkey" abajo: el SVG nace
+									horizontal (mismo viewBox/aspect-ratio medido con Pillow), con su
+									ancho fijado a "100cqh" -100% del alto del contenedor, vía el
+									"[container-type:size]" de aquí abajo, que necesita un alto Y un
+									ancho definidos desde fuera para funcionar: el alto se lo da el
+									stretch del grid con la columna de texto, el ancho el "w-8/w-10"
+									fijo- y luego se gira 90° ("rotate-90"). Como un "transform" no
+									cambia el hueco que el elemento reserva en el layout -solo lo que
+									se ve-, va con "absolute" centrado (top/left 50% + -translate-*)
+									dentro de un contenedor "relative overflow-hidden": si siguiera en
+									flujo normal, ese ancho de "100cqh" (pensado para ocupar el alto
+									final YA girado) desbordaría la columna, angosta de verdad.
+
+									La fila central ("tu negocio con") sigue con clamp+cqw: son varias
+									palabras cortas separadas con flex, no una sola que deba tocar los
+									dos bordes, así que no necesita el ajuste quirúrgico de SVG.
+								-->
+								<h1 class="text-brand-800 grid w-full max-w-md grid-cols-[1fr_auto] items-stretch gap-x-2 font-black uppercase text-left">
+									<div class="col-start-1 flex flex-col [container-type:inline-size]">
+										<svg
+											class="palabra block h-auto w-full overflow-visible"
+											viewBox="0 345 4681 734"
+											preserveAspectRatio="none"
+											data-titulo-parte="impulsa"
+										>
+											<text x="0" y="1069" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" class="fill-brand-800"
+												>IMPULSA</text
+											>
+										</svg>
+
+										<div class="flex items-center justify-between text-[clamp(0.75rem,10cqw,4rem)] font-black text-brand-600">
+											<span class="palabra" data-titulo-parte="fila">tu</span>
+											<span class="palabra" data-titulo-parte="fila">negocio</span>
+											<span class="palabra" data-titulo-parte="fila">con</span>
+										</div>
+
+										<svg
+											class="palabra block h-auto w-full overflow-visible"
+											viewBox="0 344 3463 735"
+											preserveAspectRatio="none"
+											data-titulo-parte="ohkey"
+										>
+											<text x="0" y="1069" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" class="fill-white"
+												>OHKEY</text
+											>
+										</svg>
+									</div>
+
+									<div
+										class="invisible col-start-2 relative w-8 overflow-hidden [container-type:size] sm:w-10"
+										data-titulo-parte="digital"
+									>
+										<svg
+											class="absolute top-1/2 left-1/2 h-auto w-[100cqh] -translate-x-1/2 -translate-y-1/2 rotate-90 overflow-visible"
+											viewBox="0 345 4183 734"
+											preserveAspectRatio="none"
+										>
+											<text x="0" y="1069" textLength="100%" lengthAdjust="spacingAndGlyphs" font-size="1000" class="fill-white"
+												>DIGITAL</text
+											>
+										</svg>
+									</div>
+								</h1>
+
+								<!--
+									Envoltorio propio para el párrafo+destacados+botón, con más
+									separación respecto al título que la que da el "gap-6" general
+									del contenedor padre (ese gap-6 sigue siendo el ritmo interno
+									entre estas 3 piezas): así crece solo el hueco título↔bloque,
+									sin tocar el ritmo interno del bloque.
+								-->
+								<div class="mt-8 flex w-full flex-col items-center gap-6">
+								<!--
+									Regla de acento: el mismo lima que ya usa la diapositiva 2 para
+									"negocio", de bisagra visual título -> bloque. Entra dibujándose
+									de izquierda a derecha (scaleX 0 -> 1) justo después de que
+									termina de entrar el título -ver "data-titulo-parte='accent'" en
+									el <script> del motor del slider, más abajo-.
+								-->
+								<div class="h-[5px] w-30 rounded-full bg-lime-400 sm:w-40" data-titulo-parte="accent"></div>
+
+								<p class="max-w-xl text-lg font-medium text-neutral-600 sm:text-xl">
+									La agencia de marketing que multiplica tus ventas con estrategias reales, cuidando tu
+									presupuesto.
+								</p>
+
+								<!--
+									Los 3 puntos que antes iban perdidos dentro del párrafo largo
+									("estrategias reales" / "cuidando tu presupuesto: sin gastos
+									innecesarios" / "solo resultados medibles"), ahora como
+									tarjetas-píldora (icono en su propia placa de color, no solo
+									icono+texto sueltos): a ancho completo apiladas en móvil, en
+									fila centrada en pantallas anchas.
+								-->
+								<div class="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
+									<div class="flex w-full items-center gap-3 rounded-full bg-white/55 py-2.5 pr-5 pl-2.5 shadow-[0_1px_2px_rgba(48,48,153,0.06),0_10px_24px_-14px_rgba(48,48,153,0.4)] sm:w-auto">
+										<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600/14">
+											<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-brand-600">
+												<circle cx="12" cy="12" r="8" />
+												<circle cx="12" cy="12" r="4.5" />
+												<circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
+											</svg>
+										</div>
+										<span class="text-sm font-semibold text-brand-800">Estrategias reales</span>
+									</div>
+									<div class="flex w-full items-center gap-3 rounded-full bg-white/55 py-2.5 pr-5 pl-2.5 shadow-[0_1px_2px_rgba(48,48,153,0.06),0_10px_24px_-14px_rgba(48,48,153,0.4)] sm:w-auto">
+										<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600/14">
+											<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-brand-600">
+												<ellipse cx="12" cy="7" rx="7" ry="3" />
+												<path d="M5 7v10c0 1.66 3.13 3 7 3s7-1.34 7-3V7" />
+												<path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3" />
+											</svg>
+										</div>
+										<span class="text-sm font-semibold text-brand-800">Presupuesto cuidado</span>
+									</div>
+									<div class="flex w-full items-center gap-3 rounded-full bg-white/55 py-2.5 pr-5 pl-2.5 shadow-[0_1px_2px_rgba(48,48,153,0.06),0_10px_24px_-14px_rgba(48,48,153,0.4)] sm:w-auto">
+										<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600/14">
+											<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" class="text-brand-600">
+												<line x1="5" y1="20" x2="5" y2="14" />
+												<line x1="12" y1="20" x2="12" y2="9" />
+												<line x1="19" y1="20" x2="19" y2="5" />
+											</svg>
+										</div>
+										<span class="text-sm font-semibold text-brand-800">Resultados medibles</span>
+									</div>
+								</div>
+
+								<!--
+									Botón más grande que la versión anterior, con sombra en 2
+									tonos (marca + un toque del lima de la regla de acento) para
+									más presencia; a ancho completo en móvil (mismo patrón que el
+									CTA del modal de la diapositiva 2).
+								-->
+								<a
+									href="#"
+									id="cta-servicios"
+									class="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-brand-800 px-10 py-2.5 text-sm font-semibold tracking-wide text-white uppercase shadow-[0_22px_40px_-14px_rgba(48,48,153,0.55),0_8px_18px_-8px_rgba(163,230,53,0.3)] transition-colors duration-300 hover:bg-brand-600 sm:w-auto"
+								>
+									Descubre nuestras soluciones
+									<!--
+										Mismo tamaño de placa que los iconos de los destacados de
+										arriba (h-8 w-8, círculo) para que la flecha "entre" en un
+										círculo igual al pasar el ratón, no uno inventado aparte -y
+										"py-2.5" aquí es el mismo que ya usan esas píldoras, para que
+										el botón tenga su mismo alto (antes "py-[18px]" lo hacía más
+										grueso). El "translate-x" del hover va en este envoltorio
+										-círculo + flecha juntos-, no solo en el svg: si solo se
+										desplaza la flecha, se sale del círculo (que se queda quieto)
+										y queda descuadrada.
+									-->
+									<span class="relative flex h-8 w-8 shrink-0 items-center justify-center transition-transform duration-300 group-hover:translate-x-1">
+										<span class="absolute inset-0 scale-75 rounded-full bg-white/15 opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100"></span>
+										<svg width="15" height="15" viewBox="0 0 16 16" fill="none" class="relative">
+											<path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+										</svg>
+									</span>
+								</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Diapositiva 2 -->
+			<section class="slide invisible fixed inset-0" data-slide-index="1">
+				<div class="slide__outer h-full w-full overflow-hidden">
+					<div class="slide__inner relative h-full w-full overflow-hidden">
+						<div class="slide__bg absolute inset-0 z-0 bg-black"></div>
+						<div class="relative z-10 h-full w-full">
+							<DraggableHero />
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<script>
+			import gsap from 'gsap';
+
+			// Entrada a medida del <h1> de la diapositiva 1: en vez del fundido
+			// genérico por palabra (ver "[data-titulo-parte]" más abajo, excluido
+			// a propósito de ese mecanismo), cada pieza entra desde un sitio
+			// distinto -Impulsa desde la izquierda, Ohkey desde la derecha,
+			// Digital cayendo desde arriba- pero EN EL ORDEN DE LECTURA de la
+			// frase (Impulsa → tu → negocio → con → Ohkey → Digital), una
+			// detrás de otra sin solaparse, para que se pueda leer según entra
+			// en vez de aparecer todo a la vez o en un orden que no es el de
+			// la frase.
+			//
+			// Va en un <script> aparte y ANTES del motor del slider a propósito:
+			// ese motor llama a "gotoSection(0, 1)" -que dispara "slide:enter"- de
+			// forma síncrona en cuanto termina de definirse, así que el listener
+			// de aquí abajo tiene que existir ANTES de que ese script se ejecute,
+			// o se pierde el disparo de la primera carga (los <script> de Astro
+			// son módulos y corren en el orden del documento).
+			//
+			// Sin bandera de "ya se reprodujo", igual que el resto de entradas de
+			// esta diapositiva: puede visitarse varias veces y cada una vuelve a
+			// animar desde cero (el punto de partida se fija con "gsap.set" justo
+			// antes de cada reproducción).
+			const impulsa = document.querySelector<SVGElement>('[data-titulo-parte="impulsa"]');
+			const filaCentral = gsap.utils.toArray<HTMLElement>('[data-titulo-parte="fila"]');
+			const ohkey = document.querySelector<SVGElement>('[data-titulo-parte="ohkey"]');
+			const digital = document.querySelector<HTMLElement>('[data-titulo-parte="digital"]');
+			// Regla de acento lima bajo el título (ver el <div> con esta misma
+			// marca más arriba): no es parte del título en sí, pero entra en la
+			// MISMA timeline, encadenada al final, para que se dibuje justo
+			// después de que termina de entrar la última pieza ("digital").
+			const accent = document.querySelector<HTMLElement>('[data-titulo-parte="accent"]');
+
+			function playTituloIntro(): void {
+				if (!impulsa || !ohkey || !digital || filaCentral.length === 0) return;
+
+				gsap.set(impulsa, { autoAlpha: 0, xPercent: -60, rotation: -10 });
+				gsap.set(ohkey, { autoAlpha: 0, xPercent: 60, rotation: 10 });
+				gsap.set(filaCentral, { autoAlpha: 0, yPercent: 70, scale: 0.5 });
+				gsap.set(digital, { autoAlpha: 0, yPercent: -140, rotation: -25 });
+				if (accent) gsap.set(accent, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
+
+				// El "delay" espera a que el barrido de la diapositiva (ver
+				// "DURACION" en el motor del slider, más abajo) haya despejado
+				// pantalla antes de arrancar: sin él, la entrada corría a la vez
+				// que la transición y quedaba tapada/ilegible.
+				const tl = gsap.timeline({ delay: 0.5, defaults: { ease: 'back.out(1.7)' } });
+
+				// Sin parámetro de posición: cada ".to" se encadena al FINAL del
+				// anterior (incluido su propio stagger), así que el orden en el
+				// que se escriben aquí es el orden en el que se ven -el de la
+				// frase-, sin que ninguna se solape con la siguiente. La regla de
+				// acento va la ÚLTIMA a propósito: se dibuja de izquierda a
+				// derecha (scaleX) solo cuando el título ya ha terminado de entrar.
+				tl.to(impulsa, { autoAlpha: 1, xPercent: 0, rotation: 0, duration: 0.45 })
+					.to(filaCentral, { autoAlpha: 1, yPercent: 0, scale: 1, duration: 0.35, stagger: 0.15 })
+					.to(ohkey, { autoAlpha: 1, xPercent: 0, rotation: 0, duration: 0.45 })
+					.to(digital, { autoAlpha: 1, yPercent: 0, rotation: 0, duration: 0.45 });
+
+				if (accent) tl.to(accent, { autoAlpha: 1, scaleX: 1, duration: 0.35, ease: 'power2.out' });
+			}
+
+			window.addEventListener('slide:enter', ((e: CustomEvent<{ index: number }>) => {
+				if (e.detail.index === 0) playTituloIntro();
+			}) as EventListener);
+		</script>
+
+		<script>
+			import gsap from 'gsap';
+			import { Observer } from 'gsap/Observer';
+
+			gsap.registerPlugin(Observer);
+
+			// Duración y paralaje calcados del motor de referencia
+			// (project-crm/apps/web MotorDiapositivas.astro), que es la misma
+			// mecánica de la demo "Swipe Slider" de GSAP ya probada en producción.
+			const DURACION = 1.1;
+			const PARALAJE = 15;
+
+			const sections = gsap.utils.toArray<HTMLElement>('.slide');
+			const outers = gsap.utils.toArray<HTMLElement>('.slide__outer');
+			const inners = gsap.utils.toArray<HTMLElement>('.slide__inner');
+			const backgrounds = gsap.utils.toArray<HTMLElement>('.slide__bg');
+
+			// Color de reposo de cada fondo (el morado de la diapositiva 1, el
+			// negro de la 2), leído del CSS antes de que GSAP empiece a
+			// tocarlo. Sirve para que la transición funda uno con otro a
+			// través del negro en vez de cortar de golpe entre los dos.
+			const restColors = backgrounds.map((el) => getComputedStyle(el).backgroundColor);
+
+			let currentIndex = -1;
+			let animating = false;
+
+			// La última diapositiva pedida mientras había una animación en curso.
+			// Sin esto, un segundo gesto que llega dentro de esos ~1.1s se pierde
+			// en silencio: se guarda y se atiende justo al terminar la actual.
+			let pending: number | null = null;
+
+			// ¿Ya cambió de diapositiva el gesto que se está haciendo? Un dedo
+			// apoyado (touch/pointer) entrega el recorrido a trozos, así que sin
+			// esta bandera un solo deslizamiento largo avanza varias diapositivas
+			// de golpe. La rueda, en cambio, sí se raciona un giro = una diapositiva.
+			let gestureConsumed = false;
+
+			// "sections" ya no se traslada: solo alterna visibilidad/z-index (ver
+			// abajo). El movimiento entero corre por cuenta de "outers"/"inners":
+			// dos envoltorios, cada uno con "overflow: hidden", que se desplazan
+			// en sentidos opuestos y la MISMA cantidad. Sin ese overflow-hidden,
+			// las dos transformaciones se cancelarían matemáticamente en todo
+			// instante (no solo al principio y al final) y el contenido se vería
+			// ya colocado en su posición final desde el primer fotograma, sin
+			// ningún desplazamiento visible. Con él, cada envoltorio recorta lo
+			// que hay dentro a su propio marco, que a su vez se está moviendo:
+			// eso es lo que convierte la cancelación matemática en una ventana
+			// que barre la pantalla revelando el contenido, en vez de un simple
+			// cambio de opacidad.
+			gsap.set(sections, { autoAlpha: 0, zIndex: 0 });
+			gsap.set(outers, { yPercent: 100 });
+			gsap.set(inners, { yPercent: -100 });
+
+			function gotoSection(indexRaw: number, direction: 1 | -1): void {
+				// Se topa en los extremos en vez de dar la vuelta: con "wrap",
+				// bajar en la última diapositiva volvía a la primera y se sentía
+				// como un scroll infinito sin fin. "clamp" simplemente no avanza
+				// más allá del principio o el final.
+				const index = gsap.utils.clamp(0, sections.length - 1, indexRaw);
+
+				if (index === currentIndex) return;
+
+				if (animating) {
+					pending = index;
+					return;
+				}
+
+				animating = true;
+
+				const dFactor = direction === -1 ? -1 : 1;
+
+				const tl = gsap.timeline({
+					defaults: { duration: DURACION, ease: 'power2.inOut' },
+					onComplete: () => {
+						animating = false;
+
+						const next = pending;
+						pending = null;
+
+						if (next !== null) gotoSection(next, next > currentIndex ? 1 : -1);
+					},
+				});
+
+				if (currentIndex >= 0) {
+					// La diapositiva saliente pasa al fondo de inmediato y su fondo
+					// (no su contenido: ver ".slide__bg" más abajo) se desplaza con
+					// un ligero efecto parallax mientras su color se apaga hasta
+					// negro puro -en vez de cortar de golpe a su color de reposo-,
+					// y termina oculta de verdad (autoAlpha) para que no se quede
+					// pintada por debajo ni pueda recibir clics.
+					gsap.set(sections[currentIndex], { zIndex: 0 });
+					tl.to(
+						backgrounds[currentIndex],
+						{ yPercent: -PARALAJE * dFactor, backgroundColor: '#000000' },
+						0,
+					).set(sections[currentIndex], { autoAlpha: 0 });
+				}
+
+				// La diapositiva entrante pasa al frente y su ventana (outer +
+				// inner) se desliza desde arriba o abajo según la dirección del
+				// gesto (rueda/touch), revelando el contenido a medida que
+				// avanza. Su fondo, aparte, entra con un ligero parallax propio
+				// (no el mismo desplazamiento que el contenido) y arranca en
+				// negro puro para ir aclarándose hasta su color de reposo: es lo
+				// que hace que el barrido se sienta como una ventana con
+				// profundidad, y que el cambio entre morado y negro se vea como
+				// un mismo tono fundiéndose en vez de un corte entre dos colores.
+				gsap.set(sections[index], { autoAlpha: 1, zIndex: 1 });
+				tl.fromTo(
+					[outers[index], inners[index]],
+					{ yPercent: (i: number) => (i ? -100 * dFactor : 100 * dFactor) },
+					{ yPercent: 0 },
+					0,
+				).fromTo(
+					backgrounds[index],
+					{ yPercent: PARALAJE * dFactor, backgroundColor: '#000000' },
+					{ yPercent: 0, backgroundColor: restColors[index] },
+					0,
+				);
+
+				// El contenido entra CON la diapositiva, no después: el titular se
+				// parte en palabras en la construcción (ver Titular.astro) y esas
+				// palabras se animan dentro de esta misma timeline, superpuestas
+				// con el propio desplazamiento de la diapositiva.
+				//
+				// El punto de partida se fija con "gsap.set" y no con "fromTo": un
+				// "fromTo" anidado en una timeline solo re-renderiza su estado
+				// inicial la primera vez que se llama con esas palabras: al volver a
+				// una diapositiva ya vista, esos spans conservaban el "autoAlpha: 1"
+				// de la vez anterior y el texto aparecía entero en vez de entrar
+				// escalonado. Fijando el punto de partida a mano, cada visita
+				// arranca siempre desde cero.
+				// "[data-titulo-parte]" son las piezas del <h1> de la diapositiva 1
+				// (Impulsa/fila central/Ohkey/Digital): tienen su propia entrada a
+				// medida más abajo, no la genérica de aquí.
+				// "if (words.length > 0)": hoy en día TODAS las ".palabra" de las
+				// 2 diapositivas tienen su propia coreografía a medida (ver
+				// "[data-titulo-parte]" arriba), así que este selector no
+				// encuentra nada -GSAP avisa por consola de un target vacío en
+				// cada cambio de diapositiva, sin más efecto-. Se deja la
+				// guarda en vez de borrar el mecanismo: sigue siendo el
+				// fundido genérico que recibiría cualquier palabra suelta que
+				// se añada más adelante sin coreografía propia.
+				const words = sections[index].querySelectorAll('.palabra:not([data-titulo-parte])');
+				if (words.length > 0) {
+					gsap.set(words, { autoAlpha: 0, yPercent: 120 * dFactor });
+					tl.to(
+						words,
+						{
+							autoAlpha: 1,
+							yPercent: 0,
+							duration: 0.9,
+							ease: 'power2',
+							stagger: { each: 0.03, from: 'random' },
+						},
+						0.15,
+					);
+				}
+
+				currentIndex = index;
+
+				// Permite que cada diapositiva dispare su propia animación de
+				// entrada (p. ej. las tarjetas arrastrables de la diapositiva 2)
+				// sincronizada con esta misma transición, no como algo aparte que
+				// llega después.
+				window.dispatchEvent(new CustomEvent('slide:enter', { detail: { index, direction } }));
+			}
+
+			function onGesture(self: Observer, direction: 1 | -1): void {
+				// Un arrastre (touch/pointer) se raciona; la rueda no, porque cada
+				// giro es un gesto suelto y no un recorrido continuo.
+				const isDrag = self.event.type !== 'wheel';
+
+				if (isDrag && gestureConsumed) return;
+
+				gestureConsumed = isDrag;
+				gotoSection(currentIndex + direction, direction);
+			}
+
+			Observer.create({
+				target: window,
+				type: 'wheel,touch,pointer',
+				wheelSpeed: -1,
+				tolerance: 10,
+				preventDefault: true,
+				// Sin esto, arrastrar una tarjeta de la diapositiva 2 (Draggable, en
+				// DraggableHero.astro) también cuenta como gesto de cambio de
+				// diapositiva para este Observer, que escucha en toda la ventana: el
+				// mismo movimiento lo interpretaban los dos a la vez, y a veces
+				// ganaba el slider en mitad del arrastre. "ignore" hace que el
+				// Observer descarte por completo cualquier gesto que empiece sobre
+				// una tarjeta, dejándoselo entero a Draggable.
+				ignore: '[data-draggable-card], [data-card-modal]',
+				// Un gesto nuevo empieza sin gastar. No puede ir en "onDragStart":
+				// Observer lo llama después del primer "onUp" del mismo gesto.
+				onPress: () => {
+					gestureConsumed = false;
+				},
+				onDown: (self) => onGesture(self, -1),
+				onUp: (self) => onGesture(self, 1),
+			});
+
+			function onKeydown(event: KeyboardEvent): void {
+				// El modal de información de la diapositiva 2 (DraggableHero.astro)
+				// también usa flechas/Home/End dentro de su propio contenido; con el
+				// modal abierto, esas teclas no deben además cambiar de diapositiva
+				// por debajo.
+				if (document.body.classList.contains('modal-open')) return;
+
+				const jump: Record<string, () => void> = {
+					ArrowDown: () => gotoSection(currentIndex + 1, 1),
+					PageDown: () => gotoSection(currentIndex + 1, 1),
+					ArrowUp: () => gotoSection(currentIndex - 1, -1),
+					PageUp: () => gotoSection(currentIndex - 1, -1),
+					Home: () => gotoSection(0, -1),
+					End: () => gotoSection(sections.length - 1, 1),
+				};
+
+				const action = jump[event.key];
+				if (!action) return;
+
+				event.preventDefault();
+				action();
+			}
+
+			document.addEventListener('keydown', onKeydown);
+
+			// El CTA de la diapositiva 1 lleva directamente a Servicios.
+			document.getElementById('cta-servicios')?.addEventListener('click', (e) => {
+				e.preventDefault();
+				gotoSection(1, 1);
+			});
+
+			// Muestra la primera diapositiva al cargar la página.
+			gotoSection(0, 1);
+		</script>
+	</body>
+</html>

@@ -1,0 +1,30 @@
+---
+// Titular partido en palabras en tiempo de construcción (no con SplitText
+// en el navegador), para que el slider pueda animarlas junto con la
+// propia transición de la diapositiva. Mismo patrón que
+// project-crm/apps/web/src/componentes/portada/Titular.astro.
+//
+// El espacio va FUERA del <span>: metido dentro, un span inline-block lo
+// recorta al final de línea y las palabras salen pegadas.
+interface Props {
+	texto: string;
+	como?: 'h1' | 'h2';
+	clase?: string;
+}
+
+const { texto, como = 'h2', clase = '' } = Astro.props;
+
+const palabras = texto.split(' ');
+const Encabezado = como;
+---
+
+<Encabezado class={clase}>
+	{
+		palabras.map((palabra, indice) => (
+			<Fragment>
+				<span class="palabra">{palabra}</span>
+				{indice === palabras.length - 1 ? '' : ' '}
+			</Fragment>
+		))
+	}
+</Encabezado>

@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+	--color-brand-950: #1d194c;
+	--color-brand-800: #303099;
+	--color-brand-600: #4233ce;
+	--color-brand-400: #7f57ff;
+	--color-brand-200: #a9b2ff;
+}
+
+/*
+ * Palabras de un <Titular>, listas para entrar escalonadas con la
+ * diapositiva (ver el script del slider en index.astro). Ocultas por
+ * defecto: como el resto del sitio ya depende de JS (la cortina de
+ * entrada, el slider), no hace falta un respaldo sin JavaScript aquí.
+ */
+.palabra {
+	display: inline-block;
+	visibility: hidden;
+	will-change: transform;
+}
