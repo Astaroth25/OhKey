@@ -79,6 +79,18 @@
 			defaults: { ease: 'power2.inOut', duration },
 		});
 
+		// El "cursor: pointer" de ".shape-overlays" (ver <style> arriba) venía
+		// de la demo original, donde la cortina se abría/cerraba al clic; aquí
+		// solo se reproducía una vez sin ningún listener, así que invitaba a
+		// un clic que no hacía nada. Ahora ese clic SÍ hace algo: termina la
+		// cortina al instante y avisa (evento "intro:skip") a la entrada del
+		// titular de la diapositiva 1 (ver index.astro), que empieza casi a
+		// la vez, para que también salte a su estado final.
+		svgEl.addEventListener('click', () => {
+			window.dispatchEvent(new CustomEvent('intro:skip'));
+			tl.progress(1);
+		});
+
 		// Un desfase por punto (compartido entre capas) más un desfase
 		// por capa: la capa frontal (i=0) empieza sin retraso y cada
 		// capa siguiente arranca "delayPerPath" más tarde.
