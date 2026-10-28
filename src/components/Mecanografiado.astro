@@ -1,0 +1,20 @@
+---
+interface Segmento {
+	texto: string;
+	negrita?: boolean;
+}
+
+interface Props {
+	segmentos: Segmento[];
+}
+
+const { segmentos } = Astro.props;
+---
+
+<span class="cursor-mecanografiado" data-cursor-mecanografiado aria-hidden="true">|</span>{
+	segmentos.map((segmento) =>
+		Array.from(segmento.texto).map((caracter) => (
+			<span class:list={['caracter', segmento.negrita && 'font-black']}>{caracter}</span>
+		)),
+	)
+}
