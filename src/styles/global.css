@@ -19,3 +19,46 @@
 	visibility: hidden;
 	will-change: transform;
 }
+
+/*
+ * Wordmark del logo (ver <header><svg> en index.astro): azul marino por
+ * defecto -el mismo que ya traía /public/logo.svg-, que se funde con el
+ * negro de la diapositiva 2. "body[data-slide='1']" (actualizado desde el
+ * motor del slider en index.astro) lo pasa a blanco solo ahí; el
+ * check/degradado no lleva esta clase, así que no le afecta.
+ */
+.logo-mark-fill {
+	fill: var(--color-brand-950);
+	transition: fill 1s ease;
+}
+body[data-slide='1'] .logo-mark-fill {
+	fill: #fff;
+}
+
+/*
+ * Pie fijo (ver <footer><p> en index.astro): mismo mecanismo y motivo que
+ * ".logo-mark-fill" -el brand-800 original se funde con el negro de la
+ * diapositiva 2-, así que pasa a blanco ahí también.
+ */
+.footer-text {
+	color: rgb(48 48 153);
+	transition: color 1s ease;
+}
+body[data-slide='1'] .footer-text {
+	color: #fff;
+}
+
+.caracter {
+	visibility: hidden;
+}
+
+.cursor-mecanografiado {
+	display: inline-block;
+	animation: parpadeo-cursor 0.85s step-end infinite;
+}
+
+@keyframes parpadeo-cursor {
+	50% {
+		opacity: 0;
+	}
+}

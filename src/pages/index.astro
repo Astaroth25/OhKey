@@ -2,6 +2,101 @@
 import '../styles/global.css';
 import ShapeOverlays from '../components/ShapeOverlays.astro';
 import DraggableHero from '../components/DraggableHero.astro';
+import Mecanografiado from '../components/Mecanografiado.astro';
+import WhatsAppBubble from '../components/WhatsAppBubble.astro';
+import { WHATSAPP_NUMBER } from '../lib/whatsapp';
+
+const title = 'OhKey Digital — Marketing, Software y Asesoría para tu Negocio';
+const description =
+	'Agencia de marketing digital para pequeños negocios en Ecuador y Latinoamérica: pautaje en Meta Ads, Google Ads y TikTok Ads, asesoría estratégica, desarrollo de software y cursos en vivo. Presupuestos pequeños, estrategia real.';
+const canonicalUrl = new URL('/', Astro.site).toString();
+
+const faqs = [
+	{
+		pregunta: '¿Qué servicios ofrece OhKey Digital?',
+		respuesta:
+			'Cuatro servicios bajo un mismo equipo: pautaje y contenido para redes (Meta Ads, Google Ads y TikTok Ads), asesoría estratégica, desarrollo de software (webs, apps y automatización con IA) y cursos en vivo de marketing digital, publicidad y AI.',
+	},
+	{
+		pregunta: '¿OhKey Digital funciona con presupuestos pequeños?',
+		respuesta:
+			'Sí. OhKey diseña estrategias a la medida de lo que un negocio pequeño puede invertir realmente, sin consejos genéricos ni el gasto de una agencia de nivel empresarial.',
+	},
+	{
+		pregunta: '¿Los cursos de OhKey son en vivo o pregrabados?',
+		respuesta: 'Son cursos 100% en vivo y online, con contenido siempre actualizado, no clases pregrabadas.',
+	},
+	{
+		pregunta: '¿Cómo se contacta a OhKey Digital?',
+		respuesta:
+			'Por WhatsApp directamente desde el sitio para cada servicio, o a través del canal de YouTube youtube.com/@dani.ohkey.digital.',
+	},
+	{
+		pregunta: '¿Dónde opera OhKey Digital?',
+		respuesta: 'Atiende negocios hispanohablantes en Ecuador y el resto de Latinoamérica.',
+	},
+];
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'ProfessionalService',
+			'@id': `${canonicalUrl}#organizacion`,
+			name: 'OhKey Estrategias Digitales',
+			alternateName: 'OhKey Digital',
+			url: canonicalUrl,
+			description,
+			slogan: 'Con presupuestos pequeños y cerebro.',
+			telephone: `+${WHATSAPP_NUMBER}`,
+			areaServed: ['Ecuador', 'Latinoamérica'],
+			sameAs: ['https://www.youtube.com/@dani.ohkey.digital'],
+			makesOffer: [
+				{
+					'@type': 'Offer',
+					itemOffered: {
+						'@type': 'Service',
+						name: 'Pautaje y contenido para redes',
+						description: 'Meta Ads, Google Ads y TikTok Ads optimizados para generar resultados, no solo alcance.',
+					},
+				},
+				{
+					'@type': 'Offer',
+					itemOffered: {
+						'@type': 'Service',
+						name: 'Asesoría estratégica',
+						description: 'Estrategia hecha a la medida del negocio, con un plan de acción claro y accionable.',
+					},
+				},
+				{
+					'@type': 'Offer',
+					itemOffered: {
+						'@type': 'Service',
+						name: 'Desarrollo de Software',
+						description: 'Sitios web, aplicaciones y automatización de procesos con IA.',
+					},
+				},
+				{
+					'@type': 'Offer',
+					itemOffered: {
+						'@type': 'Service',
+						name: 'Cursos y formación',
+						description: 'Cursos en vivo y online de marketing digital, publicidad y AI, con contenido siempre actualizado.',
+					},
+				},
+			],
+		},
+		{
+			'@type': 'FAQPage',
+			'@id': `${canonicalUrl}#faq`,
+			mainEntity: faqs.map((faq) => ({
+				'@type': 'Question',
+				name: faq.pregunta,
+				acceptedAnswer: { '@type': 'Answer', text: faq.respuesta },
+			})),
+		},
+	],
+};
 ---
 
 <html lang="es" class="h-full">
@@ -10,8 +105,21 @@ import DraggableHero from '../components/DraggableHero.astro';
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<meta name="description" content="Entiende, aplica y domina el marketing digital." />
-		<title>OhKey Digital — Impulsa tu negocio</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalUrl} />
+		<title>{title}</title>
+
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:site_name" content="OhKey Estrategias Digitales" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:locale" content="es_EC" />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 		<!--
 			"Kaushan Script": la cursiva de "negocio" en el titular de la
 			diapositiva 2 (ver DraggableHero.astro). Reemplaza a "Amsterdam"
@@ -32,11 +140,31 @@ import DraggableHero from '../components/DraggableHero.astro';
 		-->
 		<ShapeOverlays />
 
-		<!--
-			Fondo interactivo (WebGL, canvas, partículas, etc.).
-			Vive detrás del slider (z-0) y no intercepta clics (pointer-events-none).
-			Monta aquí en el futuro un <canvas> o el script de tu librería WebGL.
-		-->
+		<div class="sr-only">
+			<p>{description}</p>
+			<h2>Preguntas frecuentes</h2>
+			<dl>
+				{faqs.map((faq) => (
+					<>
+						<dt>{faq.pregunta}</dt>
+						<dd>{faq.respuesta}</dd>
+					</>
+				))}
+			</dl>
+		</div>
+
+		<header class="pointer-events-none fixed top-6 left-6 z-30 px-4 py-2.5" data-brand-chrome>
+			<svg class="h-15 w-auto" role="img" aria-label="OhKey Estrategias Digitales" version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 203 72" width="203" height="72"><defs><linearGradient id="P" gradientUnits="userSpaceOnUse"/><linearGradient id="g1" x2="1" href="#P" gradientTransform="matrix(227.83,0,0,141.369,60.08,21.3)"><stop stop-color="#633bff"/><stop offset=".22" stop-color="#775cfe"/><stop offset=".69" stop-color="#abb0fc"/><stop offset="1" stop-color="#cfebfb"/></linearGradient></defs><path class="logo-mark-fill" d="m137.6 16.3c9.1-2.9 18.7 0.1 20.6 12.4 0.2 1 0.5 3.2 0.5 4.1l-25.3 7.8c1.7 3.8 5.5 5.6 11.4 3.8 4-1.3 7.8-3.7 11.5-8l1.4 10.8c-3.2 2.8-6.9 5-12.7 6.8-12.6 3.9-21.4-2.3-23.1-12.9-1.7-11 3.8-21.1 15.7-24.8zm9.5 14c-0.9-4.6-4.2-6.3-7.9-5.1-5.1 1.6-6.7 5.5-6.7 9.6z"/><path class="logo-mark-fill" d="m202.1 17.5l-32.8 51h-12.7l11.7-16.7-9.1-34.3h12.8l3.7 16.5c0.5 2.2 0.7 3.7 0.4 9.3 1.7-5.6 2.4-7.1 3.7-9.3l9.6-16.5c0 0 12.7 0 12.7 0zm-128.1-1.2c-6.3 0-9.7 2.8-15.2 10.7l1.8-3.4c1.2-2.3 1.8-3.9 2.2-6.3l3-17.2h-11.5l-1.5 8.2c4.1 5.1 5.7 12.1 4.6 19.8-1.2 8.8-5.5 16.1-11.8 21.1l-0.8 4.2h11.6l3.1-17.4c1.3-7.1 5.3-9.3 8.3-9.3 2.8 0 5.8 1.8 4.9 7l-3.5 19.7h11.6l3.7-20.9c1.9-10.8-2.9-16.2-10.5-16.2zm-51.3 49.2q0.2 0.9 0.9 1.5 0.7 0.5 1.7 0.5 1.5 0 2.1-1.1l1.1 0.6q-1.1 1.7-3.2 1.7-1.7 0-2.8-1.1-1.1-1.1-1.1-2.7 0-1.7 1.1-2.7 1-1.1 2.7-1.1c1.7 0 1.9 0.4 2.6 1.1q1 1.1 1 2.7 0 0.3 0 0.6zm2.4-3.2q-1 0-1.6 0.5-0.7 0.6-0.8 1.6h4.8q-0.2-1.1-0.8-1.6c-0.7-0.5-1-0.5-1.6-0.5zm5.8 0.9q0 0.4 0.4 0.7 0.4 0.2 1 0.4 0.6 0.2 1.2 0.3 0.6 0.2 1 0.7 0.4 0.5 0.4 1.2 0 1-0.8 1.6-0.7 0.6-1.9 0.6-1.1 0-1.8-0.5-0.8-0.4-1.1-1.2l1.1-0.6q0.2 0.5 0.7 0.8 0.4 0.3 1.1 0.3 0.6 0 1-0.3 0.4-0.2 0.4-0.7 0-0.4-0.4-0.7-0.4-0.2-1-0.4l-1.2-0.4q-0.6-0.1-1-0.6-0.4-0.5-0.4-1.2 0-0.9 0.7-1.5 0.7-0.6 1.8-0.6 0.9 0 1.6 0.4 0.7 0.4 1 1.1l-1 0.6q-0.4-1-1.6-1-0.5 0-0.9 0.3-0.3 0.2-0.3 0.7zm9-0.7h-1.9v3.9q0 0.5 0.2 0.8 0.2 0.2 0.6 0.2 0.5 0 1.1 0v1.1q-1.6 0.2-2.4-0.3-0.8-0.5-0.8-1.8v-3.9h-1.4v-1.2h1.4v-1.7l1.3-0.3v2h1.9c0 0 0 1.2 0 1.2zm2.7 0q0.6-1.4 2.2-1.4v1.4q-0.9-0.1-1.5 0.4-0.7 0.6-0.7 1.8v3.8h-1.3v-7.2h1.3zm8.9-1.2h1.3v7.2h-1.3v-1.3q-0.9 1.5-2.7 1.5-1.5 0-2.6-1.1-1-1.1-1-2.7 0-1.6 1-2.7 1.1-1.1 2.6-1.1 1.8 0 2.7 1.4v-1.2zm-2.5 6.2q1.1 0 1.8-0.8 0.7-0.7 0.7-1.8 0-1.1-0.7-1.8-0.7-0.8-1.8-0.8-1.1 0-1.8 0.8-0.8 0.7-0.8 1.8 0 1.1 0.8 1.8 0.7 0.8 1.8 0.8zm9.5-5h-1.9v3.9q0 0.5 0.2 0.8 0.2 0.2 0.6 0.2 0.5 0 1.1 0v1.1q-1.6 0.2-2.4-0.3-0.8-0.4-0.8-1.8v-3.9h-1.4v-1.2h1.4v-1.7l1.3-0.3v2h1.9c0 0 0 1.2 0 1.2zm1.9 3q0.2 0.9 0.9 1.5 0.7 0.5 1.7 0.5 1.5 0 2.1-1l1.1 0.6q-1.1 1.6-3.2 1.6-1.7 0-2.8-1.1-1.1-1.1-1.1-2.7 0-1.6 1.1-2.7 1-1.1 2.7-1.1c1.7 0 1.9 0.4 2.6 1.1q1 1.1 1 2.7 0 0.3 0 0.6zm2.5-3.2q-1 0-1.7 0.6-0.7 0.5-0.8 1.5h4.8q-0.2-1-0.8-1.6c-0.7-0.5-1-0.5-1.5-0.5zm10.9-1h1.2v6.9q0 1.6-1.1 2.5-1.1 0.9-2.6 0.9-1.2 0-2.1-0.5-0.9-0.4-1.3-1.3l1.1-0.6q0.6 1.2 2.3 1.2 1.2 0 1.8-0.6 0.7-0.6 0.7-1.6v-1q-1 1.4-2.8 1.4-1.5 0-2.6-1.1-1-1.1-1-2.6 0-1.6 1-2.7 1.1-1.1 2.6-1.1 1.8 0 2.8 1.4c0 0 0-1.2 0-1.2zm-4.4 5.4q0.7 0.7 1.8 0.7 1.1 0 1.8-0.7 0.8-0.8 0.8-1.8 0-1.1-0.8-1.9-0.7-0.7-1.8-0.7-1.1 0-1.8 0.7-0.8 0.8-0.8 1.9 0 1 0.8 1.8zm8-6.7q-0.3 0-0.6-0.3-0.2-0.2-0.2-0.6 0-0.3 0.2-0.6 0.3-0.2 0.6-0.2 0.4 0 0.6 0.2 0.3 0.3 0.3 0.6 0 0.4-0.3 0.6-0.2 0.3-0.6 0.3zm-0.6 8.5v-7.2h1.2v7.2zm9.1-7.2h1.2v7.2h-1.2v-1.2q-1 1.4-2.7 1.4-1.6 0-2.6-1.1-1.1-1.1-1.1-2.7 0-1.6 1.1-2.7 1-1.1 2.6-1.1 1.7 0 2.7 1.4v-1.2zm-2.6 6.2q1.1 0 1.8-0.7 0.8-0.8 0.8-1.9 0-1.1-0.8-1.8-0.7-0.8-1.8-0.8-1.1 0-1.8 0.8-0.7 0.7-0.7 1.8 0 1.1 0.7 1.9 0.7 0.7 1.8 0.7zm6.7-4.3q0 0.4 0.4 0.7 0.4 0.2 1 0.4 0.6 0.2 1.2 0.4 0.6 0.1 1 0.6 0.4 0.5 0.4 1.3 0 0.9-0.7 1.5-0.8 0.6-2 0.6-1 0-1.8-0.4-0.7-0.5-1-1.3l1-0.6q0.2 0.5 0.7 0.8 0.5 0.3 1.1 0.3 0.7 0 1.1-0.2 0.3-0.3 0.4-0.8 0-0.4-0.5-0.6-0.4-0.3-1-0.5l-1.2-0.3q-0.6-0.2-1-0.7-0.4-0.4-0.4-1.1 0-1 0.7-1.6 0.8-0.6 1.9-0.6 0.9 0 1.5 0.4 0.7 0.4 1.1 1.1l-1.1 0.6q-0.4-0.9-1.5-0.9-0.6 0-0.9 0.2-0.4 0.3-0.4 0.7zm14.9-4.8h1.2v10.1h-1.2v-1.2q-1 1.4-2.7 1.4-1.6 0-2.6-1.1-1.1-1.1-1.1-2.7 0-1.6 1.1-2.7 1-1.1 2.6-1.1 1.7 0 2.7 1.5v-4.2zm-2.6 9.1q1.1 0 1.8-0.7 0.8-0.8 0.8-1.9 0-1.1-0.8-1.8-0.7-0.7-1.8-0.7-1.1 0-1.8 0.7-0.7 0.7-0.7 1.8 0 1.1 0.7 1.9 0.7 0.7 1.8 0.7zm6.3-7.5q-0.4 0-0.6-0.2-0.3-0.3-0.3-0.6 0-0.4 0.3-0.6 0.2-0.3 0.6-0.3 0.3 0 0.6 0.3 0.2 0.2 0.2 0.6c0 0.3-0.1 0.4-0.2 0.6q-0.3 0.2-0.6 0.2zm-0.7 8.5v-7.2h1.3v7.2zm9-7.2h1.3v6.9q0 1.6-1.1 2.5-1.1 0.9-2.6 0.9-1.2 0-2.1-0.4-0.9-0.5-1.3-1.3l1.1-0.7q0.6 1.3 2.3 1.3 1.2-0.1 1.8-0.6 0.7-0.6 0.6-1.7v-1q-0.9 1.5-2.7 1.5-1.5 0-2.6-1.1-1-1.1-1-2.7 0-1.6 1-2.7 1.1-1.1 2.6-1.1 1.8 0 2.7 1.5c0 0 0-1.3 0-1.3zm-4.4 5.4q0.8 0.8 1.9 0.8 1.1 0 1.8-0.8 0.7-0.7 0.7-1.8 0-1.1-0.7-1.8-0.7-0.8-1.8-0.8-1.1 0-1.9 0.8-0.7 0.7-0.7 1.8 0 1.1 0.7 1.8zm8.1-6.7q-0.3 0-0.6-0.2-0.2-0.3-0.3-0.6 0-0.4 0.3-0.6 0.2-0.3 0.6-0.3 0.4 0 0.6 0.3 0.2 0.2 0.2 0.6c0 0.3 0 0.4-0.2 0.6q-0.2 0.2-0.6 0.2zm-0.6 8.5v-7.2h1.2v7.2zm7-6h-1.9v4q0 0.5 0.2 0.7 0.2 0.2 0.7 0.2 0.4 0 1 0v1.2q-1.6 0.2-2.4-0.3-0.7-0.5-0.8-1.8v-4h-1.4v-1.2h1.4v-1.6l1.3-0.4v2h1.9c0 0 0 1.2 0 1.2zm7-1.2h1.3v7.2h-1.3v-1.2q-0.9 1.4-2.7 1.4-1.5 0-2.6-1.1-1.1-1.1-1.1-2.7 0-1.6 1.1-2.6 1.1-1.2 2.6-1.1 1.8 0 2.7 1.4v-1.3zm-2.6 6.2q1.1 0 1.9-0.7 0.7-0.7 0.7-1.8 0-1.1-0.7-1.9-0.8-0.7-1.9-0.7-1.1 0-1.8 0.7-0.7 0.8-0.7 1.9 0 1.1 0.7 1.8 0.8 0.7 1.8 0.7zm5.7 1.1v-10.6h1.2v10.6zm4-3.1q0.1 1 0.8 1.5 0.7 0.6 1.8 0.6 1.4 0 2.1-1.1l1 0.6q-1 1.7-3.2 1.7-1.7 0-2.7-1.1-1.1-1.1-1.1-2.7 0-1.7 1-2.8 1.1-1 2.8-1 1.5 0 2.5 1.1 1.1 1.1 1 2.7 0.1 0.2 0 0.5zm2.5-3.2q-1 0-1.7 0.6-0.6 0.6-0.8 1.5h4.8q-0.1-1-0.8-1.5c-0.6-0.6-0.9-0.6-1.5-0.6zm5.7 1q0 0.4 0.5 0.6 0.4 0.3 1 0.5 0.6 0.1 1.1 0.3 0.6 0.2 1.1 0.7 0.4 0.4 0.4 1.2 0 1-0.8 1.6-0.8 0.5-1.9 0.6-1.1 0-1.8-0.5-0.8-0.5-1.1-1.2l1.1-0.7q0.2 0.6 0.6 0.9 0.5 0.3 1.2 0.3 0.6 0 1-0.3 0.4-0.2 0.4-0.7 0-0.4-0.4-0.7-0.1-0.1-0.3-0.1-0.1-0.1-0.2-0.1-0.1-0.1-0.3-0.1-0.1-0.1-0.2-0.1l-1.2-0.4q-0.6-0.2-1-0.6-0.4-0.5-0.5-1.2 0-0.9 0.8-1.5 0.7-0.6 1.8-0.6 0.9-0.1 1.6 0.4 0.7 0.4 1 1.1l-1 0.5q-0.4-0.9-1.6-0.9-0.5 0-0.9 0.3-0.4 0.2-0.4 0.7z"/><path class="logo-mark-fill" d="m54.9 27.9c-2 14.7-13.8 26.7-31 26.7-17.3 0-25.5-12-23.5-26.7 2.1-14.7 13.8-26.7 31-26.7 17.3 0 25.6 12 23.5 26.7zm-16.9 12.7c6.2-6.6 5.7-16.7 0-23.7-5.7-7.1-14.4-8.4-20.6-1.8-6.2 6.6-5.7 16.7 0 23.8 5.7 7 14.4 8.3 20.6 1.7zm55.4-3.2q-0.4-0.7-0.6-1.5c-1-3.4-2.4-6.6-4.1-9.7l-4.8 27.2h11.6l1.9-10.8c0.1-0.6 0.2-1 0.2-1.6-1.8-0.5-3.4-1.8-4.2-3.6zm9.1 3.4q-1 0.4-2 0.5l6.3 12.1h14.2l-11.4-19.1q-1.5 1.6-3 3.2c-1.2 1.3-2.5 2.5-4.1 3.3zm-1.7-17.3l4.1-23.4h-11.6l-1.7 9.5q1.3 0.4 2.4 1.5c3.3 3.5 5.4 7.8 6.8 12.4z"/><path fill="url(#g1)" d="m151.9 1.3c-0.4-0.1-0.8-0.1-1.2-0.1q-1.4 0.2-2.7 0.4c-7.8 1.5-15.2 4.2-22.3 7.7-8.8 4.2-16.8 9.6-23.7 16.4-0.1 0.2-0.3 0.4-0.5 0.6-0.3-1-0.5-1.8-0.7-2.7q0-0.1-0.1-0.1v-0.2c-1.4-4.6-3.5-8.7-6.8-12.2q-1-1.1-2.3-1.5 0 0-0.1-0.1v0.1l-2.9 16.5q0 0.1 0.1 0.1c1.7 3.1 3.1 6.3 4.1 9.7q0.2 0.8 0.6 1.5c0.7 1.8 2.3 3 4.1 3.6q0.1 0 0.1 0 1.4 0.5 2.8 0.3h0.1q1-0.1 2-0.5c1.6-0.8 2.9-2 4.1-3.3q1.4-1.6 2.9-3.1l0.1-0.1c7.4-7.6 15.5-14.2 24.3-20.1 4.8-3.2 9.7-6.1 15-8.2 1-0.3 2-0.6 3-1 0.9-0.4 1.4-1.1 1.4-2-0.1-0.8-0.6-1.4-1.4-1.7z"/></svg>
+		</header>
+
+		<footer class="pointer-events-none fixed inset-x-0 bottom-2 z-30 flex justify-center" data-brand-chrome>
+			<p class="footer-text whitespace-nowrap px-4 text-[clamp(0.625rem,2.3vw,0.6875rem)] font-medium tracking-wide">
+				© 2026 OhKey Estrategias Digitales · Hecho con estrategia, no con suerte.
+			</p>
+		</footer>
+
+		<WhatsAppBubble />
+
 		<div id="interactive-bg" class="fixed inset-0 z-0 pointer-events-none"></div>
 
 		<main id="slider" class="fixed inset-0 overflow-hidden bg-white text-white">
@@ -44,93 +172,14 @@ import DraggableHero from '../components/DraggableHero.astro';
 			<section class="slide invisible fixed inset-0" data-slide-index="0">
 				<div class="slide__outer h-full w-full overflow-hidden">
 					<div class="slide__inner relative h-full w-full overflow-hidden">
-						<!--
-							El fondo opaco vive DENTRO de la ventana que barre la pantalla,
-							no en la sección exterior (que ya no se traslada, solo cambia
-							de opacidad de golpe). Si el fondo estuviera en la sección, al
-							pasar a visible taparía toda la pantalla de un salto, antes de
-							que el barrido tuviera ocasión de revelar nada.
-						-->
-						<!--
-							Mancha de color muy desenfocada (mismo "brand-400" del resto de la
-							paleta, no un color nuevo): rompe el lila plano de fondo sin
-							convertirse en un degradado agresivo. Vive dentro de ".slide__bg"
-							-la misma capa que ya se mueve con el parallax de la transición del
-							slider- para que se desplace junto al resto del fondo, no como un
-							elemento aparte.
-						-->
 						<div class="slide__bg absolute inset-0 z-0 overflow-hidden bg-brand-200">
 							<div class="absolute -top-[100px] -right-[110px] h-[320px] w-[320px] rounded-full bg-brand-400/35 blur-[70px] sm:-top-[140px] sm:-right-[120px] sm:h-[640px] sm:w-[640px] sm:blur-[90px]"></div>
+
+							<div class="absolute -bottom-[90px] -left-[100px] h-[260px] w-[260px] rounded-full bg-brand-600/20 blur-[60px] sm:-bottom-[120px] sm:-left-[110px] sm:h-[480px] sm:w-[480px] sm:blur-[80px]"></div>
 						</div>
 						<div class="relative z-10 flex h-full w-full items-center justify-center px-8">
-							<!--
-							"w-full" es necesario, no cosmético (ver el mismo fix en
-							DraggableHero.astro/".hero-heading"): sin un ancho DEFINIDO
-							aquí, el "w-full" en % del <h1> de dentro no tendría de dónde
-							sacar su ancho. Aquí "funcionaba" sin él porque el párrafo de
-							abajo, con texto normal, le daba de casualidad un ancho de
-							sobra al contenedor -misma trampa que hizo colapsar a 0x0 el
-							título de la diapositiva 2, que no tenía ese párrafo al lado-.
-						-->
 						<div class="flex w-full max-w-2xl flex-col items-center gap-6 text-center">
-								<!--
-									"Impulsa" y "Ohkey" van en SVG, no en <span> con clamp+cqw: por bien
-									calibrado que esté un ratio letra→ancho, depende de adivinar qué
-									fuente va a usar de verdad el navegador, y ese margen residual
-									-aunque sean un par de puntos- es justo el hueco que no queríamos.
-									"textLength" en SVG resuelve esto de raíz: el navegador estira o
-									comprime el propio texto (lengthAdjust="spacingAndGlyphs") para que
-									ocupe EXACTO el 100% del ancho del viewBox, sea cual sea la fuente
-									con la que termine renderizando -sin calibrar nada, sin margen
-									posible-. El alto sale solo (viewBox con el aspect-ratio real de
-									cada palabra, medido a mano con Pillow), así que el eje vertical
-									sigue sin tocarse.
-
-									"overflow-visible" en cada <svg> es necesario: el viewBox se
-									midió justo al borde de la tinta (sin margen, a propósito), pero
-									una letra redonda (la "O" de "Ohkey") suele tener un pelín de
-									"overshoot" óptico más allá de ese borde en la fuente real del
-									navegador -no en la que medí yo-. Sin "overflow-visible" (el valor
-									por defecto de <svg> es "hidden"), ese pelín se recorta y la curva
-									se ve plana/cortada en vez de redonda.
-
-									Van en mayúsculas literales ("IMPULSA"/"OHKEY") en vez de fiarse
-									del "uppercase" del <h1>: ese aspect-ratio se midió sobre las
-									mayúsculas, y el soporte de "text-transform" dentro de <svg> es
-									menos fiable entre navegadores -con una "p" o una "h" minúscula
-									real, la caja quedaría mal proporcionada (la "p" con descendente
-									asomando fuera del viewBox, por ejemplo).
-
-									"w-full" en el <h1> es clave: sin un ancho DEFINIDO (con "w-auto"
-									pasaba esto) la columna de texto se autodimensiona por su propio
-									contenido -una referencia circular-. Con "w-full" el ancho lo fija
-									el contenedor -"max-w-md" de aquí abajo, más angosto que el párrafo
-									de debajo a propósito para que el título salga más pequeño-, así
-									que nunca depende de cuánto midan las palabras que hay dentro.
-
-									"text-left" deshace el "text-center" heredado del contenedor padre
-									(pensado para el párrafo y el botón, que sí siguen centrados).
-
-									"Digital" usa el mismo truco de SVG+textLength, pero para llenar
-									el ALTO -no el ancho- de su columna y así coincidir exacto con la
-									A de "Impulsa" arriba y la Y de "Ohkey" abajo: el SVG nace
-									horizontal (mismo viewBox/aspect-ratio medido con Pillow), con su
-									ancho fijado a "100cqh" -100% del alto del contenedor, vía el
-									"[container-type:size]" de aquí abajo, que necesita un alto Y un
-									ancho definidos desde fuera para funcionar: el alto se lo da el
-									stretch del grid con la columna de texto, el ancho el "w-8/w-10"
-									fijo- y luego se gira 90° ("rotate-90"). Como un "transform" no
-									cambia el hueco que el elemento reserva en el layout -solo lo que
-									se ve-, va con "absolute" centrado (top/left 50% + -translate-*)
-									dentro de un contenedor "relative overflow-hidden": si siguiera en
-									flujo normal, ese ancho de "100cqh" (pensado para ocupar el alto
-									final YA girado) desbordaría la columna, angosta de verdad.
-
-									La fila central ("tu negocio con") sigue con clamp+cqw: son varias
-									palabras cortas separadas con flex, no una sola que deba tocar los
-									dos bordes, así que no necesita el ajuste quirúrgico de SVG.
-								-->
-								<h1 class="text-brand-800 grid w-full max-w-md grid-cols-[1fr_auto] items-stretch gap-x-2 font-black uppercase text-left">
+								<h1 class="text-brand-800 relative grid w-full max-w-md grid-cols-[1fr_auto] items-stretch gap-x-2 font-black uppercase text-left">
 									<div class="col-start-1 flex flex-col [container-type:inline-size]">
 										<svg
 											class="palabra block h-auto w-full overflow-visible"
@@ -175,94 +224,47 @@ import DraggableHero from '../components/DraggableHero.astro';
 											>
 										</svg>
 									</div>
+
+									<div
+										data-nota-clases
+										class="absolute bottom-0 left-full z-20 ml-8 hidden -mb-4 rotate-6 flex-col items-center gap-3 rounded-2xl bg-lime-300 p-6 pb-14 normal-case shadow-[0_18px_30px_-12px_rgba(29,25,76,0.45)] xl:flex"
+									>
+										<span class="text-3xl leading-tight text-brand-800 text-center font-light [font-family:'Kaushan_Script']">Clases<br />gratuitas:</span>
+										<a
+											href="https://www.youtube.com/@dani.ohkey.digital"
+											target="_blank"
+											rel="noopener noreferrer"
+											class="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 -rotate-8 rounded-full bg-orange-500 px-5 py-2 text-sm font-black whitespace-nowrap text-brand-800 shadow-md transition-transform duration-300 hover:scale-105"
+										>
+											youtube.com/@dani.ohkey.digital
+										</a>
+									</div>
 								</h1>
 
-								<!--
-									Envoltorio propio para el párrafo+destacados+botón, con más
-									separación respecto al título que la que da el "gap-6" general
-									del contenedor padre (ese gap-6 sigue siendo el ritmo interno
-									entre estas 3 piezas): así crece solo el hueco título↔bloque,
-									sin tocar el ritmo interno del bloque.
-								-->
 								<div class="mt-8 flex w-full flex-col items-center gap-6">
-								<!--
-									Regla de acento: el mismo lima que ya usa la diapositiva 2 para
-									"negocio", de bisagra visual título -> bloque. Entra dibujándose
-									de izquierda a derecha (scaleX 0 -> 1) justo después de que
-									termina de entrar el título -ver "data-titulo-parte='accent'" en
-									el <script> del motor del slider, más abajo-.
-								-->
+
 								<div class="h-[5px] w-30 rounded-full bg-lime-400 sm:w-40" data-titulo-parte="accent"></div>
 
-								<p class="max-w-xl text-lg font-medium text-neutral-600 sm:text-xl">
-									La agencia de marketing que multiplica tus ventas con estrategias reales, cuidando tu
-									presupuesto.
+								<p class="max-w-2xl text-lg font-normal text-brand-600 sm:text-xl" data-mecanografiado="intro">
+									<Mecanografiado
+										segmentos={[
+											{ texto: 'Con ' },
+											{ texto: 'presupuestos pequeños y cerebro.', negrita: true },
+											{
+												texto:
+													' Publicidad digital, contenido y tecnología para crecer con inteligencia, optimizar tu inversión y convertir tus objetivos en resultados.',
+											},
+										]}
+									/>
 								</p>
 
-								<!--
-									Los 3 puntos que antes iban perdidos dentro del párrafo largo
-									("estrategias reales" / "cuidando tu presupuesto: sin gastos
-									innecesarios" / "solo resultados medibles"), ahora como
-									tarjetas-píldora (icono en su propia placa de color, no solo
-									icono+texto sueltos): a ancho completo apiladas en móvil, en
-									fila centrada en pantallas anchas.
-								-->
-								<div class="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
-									<div class="flex w-full items-center gap-3 rounded-full bg-white/55 py-2.5 pr-5 pl-2.5 shadow-[0_1px_2px_rgba(48,48,153,0.06),0_10px_24px_-14px_rgba(48,48,153,0.4)] sm:w-auto">
-										<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600/14">
-											<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-brand-600">
-												<circle cx="12" cy="12" r="8" />
-												<circle cx="12" cy="12" r="4.5" />
-												<circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
-											</svg>
-										</div>
-										<span class="text-sm font-semibold text-brand-800">Estrategias reales</span>
-									</div>
-									<div class="flex w-full items-center gap-3 rounded-full bg-white/55 py-2.5 pr-5 pl-2.5 shadow-[0_1px_2px_rgba(48,48,153,0.06),0_10px_24px_-14px_rgba(48,48,153,0.4)] sm:w-auto">
-										<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600/14">
-											<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" class="text-brand-600">
-												<ellipse cx="12" cy="7" rx="7" ry="3" />
-												<path d="M5 7v10c0 1.66 3.13 3 7 3s7-1.34 7-3V7" />
-												<path d="M5 12c0 1.66 3.13 3 7 3s7-1.34 7-3" />
-											</svg>
-										</div>
-										<span class="text-sm font-semibold text-brand-800">Presupuesto cuidado</span>
-									</div>
-									<div class="flex w-full items-center gap-3 rounded-full bg-white/55 py-2.5 pr-5 pl-2.5 shadow-[0_1px_2px_rgba(48,48,153,0.06),0_10px_24px_-14px_rgba(48,48,153,0.4)] sm:w-auto">
-										<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600/14">
-											<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" class="text-brand-600">
-												<line x1="5" y1="20" x2="5" y2="14" />
-												<line x1="12" y1="20" x2="12" y2="9" />
-												<line x1="19" y1="20" x2="19" y2="5" />
-											</svg>
-										</div>
-										<span class="text-sm font-semibold text-brand-800">Resultados medibles</span>
-									</div>
-								</div>
-
-								<!--
-									Botón más grande que la versión anterior, con sombra en 2
-									tonos (marca + un toque del lima de la regla de acento) para
-									más presencia; a ancho completo en móvil (mismo patrón que el
-									CTA del modal de la diapositiva 2).
-								-->
 								<a
 									href="#"
 									id="cta-servicios"
-									class="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-brand-800 px-10 py-2.5 text-sm font-semibold tracking-wide text-white uppercase shadow-[0_22px_40px_-14px_rgba(48,48,153,0.55),0_8px_18px_-8px_rgba(163,230,53,0.3)] transition-colors duration-300 hover:bg-brand-600 sm:w-auto"
+									class="group inline-flex w-full items-center justify-center gap-3 whitespace-nowrap rounded-full bg-brand-800 px-10 py-2.5 text-[clamp(0.6rem,2.6vw,0.875rem)] font-black tracking-wide text-white uppercase shadow-[0_22px_40px_-14px_rgba(48,48,153,0.55),0_8px_18px_-8px_rgba(163,230,53,0.3)] transition-colors duration-300 hover:bg-brand-600 sm:w-auto"
 								>
-									Descubre nuestras soluciones
-									<!--
-										Mismo tamaño de placa que los iconos de los destacados de
-										arriba (h-8 w-8, círculo) para que la flecha "entre" en un
-										círculo igual al pasar el ratón, no uno inventado aparte -y
-										"py-2.5" aquí es el mismo que ya usan esas píldoras, para que
-										el botón tenga su mismo alto (antes "py-[18px]" lo hacía más
-										grueso). El "translate-x" del hover va en este envoltorio
-										-círculo + flecha juntos-, no solo en el svg: si solo se
-										desplaza la flecha, se sale del círculo (que se queda quieto)
-										y queda descuadrada.
-									-->
+									Hagamos crecer tu negocio
+
 									<span class="relative flex h-8 w-8 shrink-0 items-center justify-center transition-transform duration-300 group-hover:translate-x-1">
 										<span class="absolute inset-0 scale-75 rounded-full bg-white/15 opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100"></span>
 										<svg width="15" height="15" viewBox="0 0 16 16" fill="none" class="relative">
@@ -324,20 +326,72 @@ import DraggableHero from '../components/DraggableHero.astro';
 			// después de que termina de entrar la última pieza ("digital").
 			const accent = document.querySelector<HTMLElement>('[data-titulo-parte="accent"]');
 
+			const parrafoIntro = document.querySelector<HTMLElement>('[data-mecanografiado="intro"]');
+			const caracteresIntro = parrafoIntro ? gsap.utils.toArray<HTMLElement>('.caracter', parrafoIntro) : [];
+			const cursorIntro = parrafoIntro?.querySelector<HTMLElement>('[data-cursor-mecanografiado]') ?? null;
+			const notaClases = document.querySelector<HTMLElement>('[data-nota-clases]');
+			const ctaIntro = document.getElementById('cta-servicios');
+			const PASO_MECANOGRAFIADO = 0.032;
+			const PAUSA_ANTES_DE_ESCRIBIR = 0.6;
+
+			// La entrada del título y el mecanografiado solo se ven la primera
+			// vez que se visita esta diapositiva: en visitas siguientes resultan
+			// pesadas de esperar para quien ya las vio, así que directamente se
+			// deja todo en su estado final sin animar nada.
+			let yaAnimadoIntro = false;
+			let tlIntroActual: gsap.core.Timeline | null = null;
+
+			// Estado final de la entrada del titular, sin animar: lo usan tanto
+			// una visita repetida a esta diapositiva (más abajo) como el salto
+			// manual de la intro (evento "intro:skip", ver ShapeOverlays.astro) -
+			// mismo código, dos disparadores distintos.
+			function mostrarTituloIntroFinal(): void {
+				tlIntroActual?.kill();
+				if (!impulsa || !ohkey || !digital) return;
+				gsap.set([impulsa, ohkey, ...filaCentral, digital], {
+					autoAlpha: 1,
+					xPercent: 0,
+					yPercent: 0,
+					rotation: 0,
+					scale: 1,
+				});
+				if (accent) gsap.set(accent, { autoAlpha: 1, scaleX: 1 });
+				if (notaClases) gsap.set(notaClases, { autoAlpha: 1, scale: 1 });
+				if (ctaIntro) gsap.set(ctaIntro, { autoAlpha: 1, yPercent: 0 });
+				gsap.set(caracteresIntro, { visibility: 'visible' });
+				if (cursorIntro && parrafoIntro) {
+					gsap.set(cursorIntro, { autoAlpha: 1 });
+					parrafoIntro.append(cursorIntro);
+				}
+			}
+
 			function playTituloIntro(): void {
 				if (!impulsa || !ohkey || !digital || filaCentral.length === 0) return;
+
+				if (yaAnimadoIntro) {
+					mostrarTituloIntroFinal();
+					return;
+				}
+
+				yaAnimadoIntro = true;
 
 				gsap.set(impulsa, { autoAlpha: 0, xPercent: -60, rotation: -10 });
 				gsap.set(ohkey, { autoAlpha: 0, xPercent: 60, rotation: 10 });
 				gsap.set(filaCentral, { autoAlpha: 0, yPercent: 70, scale: 0.5 });
 				gsap.set(digital, { autoAlpha: 0, yPercent: -140, rotation: -25 });
 				if (accent) gsap.set(accent, { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
+				if (notaClases) gsap.set(notaClases, { autoAlpha: 0, scale: 0.6, transformOrigin: 'bottom left' });
+				if (ctaIntro) gsap.set(ctaIntro, { autoAlpha: 0, yPercent: 20 });
+				if (cursorIntro && parrafoIntro) parrafoIntro.prepend(cursorIntro);
+				if (cursorIntro) gsap.set(cursorIntro, { autoAlpha: 0 });
+				gsap.set(caracteresIntro, { visibility: 'hidden' });
 
 				// El "delay" espera a que el barrido de la diapositiva (ver
 				// "DURACION" en el motor del slider, más abajo) haya despejado
 				// pantalla antes de arrancar: sin él, la entrada corría a la vez
 				// que la transición y quedaba tapada/ilegible.
 				const tl = gsap.timeline({ delay: 0.5, defaults: { ease: 'back.out(1.7)' } });
+				tlIntroActual = tl;
 
 				// Sin parámetro de posición: cada ".to" se encadena al FINAL del
 				// anterior (incluido su propio stagger), así que el orden en el
@@ -351,11 +405,32 @@ import DraggableHero from '../components/DraggableHero.astro';
 					.to(digital, { autoAlpha: 1, yPercent: 0, rotation: 0, duration: 0.45 });
 
 				if (accent) tl.to(accent, { autoAlpha: 1, scaleX: 1, duration: 0.35, ease: 'power2.out' });
+
+				if (notaClases) tl.to(notaClases, { autoAlpha: 1, scale: 1, duration: 0.5 });
+
+				if (cursorIntro) tl.set(cursorIntro, { autoAlpha: 1 });
+				tl.to({}, { duration: PAUSA_ANTES_DE_ESCRIBIR });
+
+				caracteresIntro.forEach((caracter) => {
+					tl.set(caracter, { visibility: 'visible' }, `+=${PASO_MECANOGRAFIADO}`).call(() => {
+						if (cursorIntro) caracter.insertAdjacentElement('afterend', cursorIntro);
+					});
+				});
+
+				if (ctaIntro) tl.to(ctaIntro, { autoAlpha: 1, yPercent: 0, duration: 0.5 });
 			}
 
 			window.addEventListener('slide:enter', ((e: CustomEvent<{ index: number }>) => {
 				if (e.detail.index === 0) playTituloIntro();
 			}) as EventListener);
+
+			// Clic en la cortina de entrada (ver ShapeOverlays.astro): salta
+			// directamente al estado final de esta entrada, sin esperar a que
+			// termine su propia animación.
+			window.addEventListener('intro:skip', () => {
+				yaAnimadoIntro = true;
+				mostrarTituloIntroFinal();
+			});
 		</script>
 
 		<script>
@@ -590,6 +665,17 @@ import DraggableHero from '../components/DraggableHero.astro';
 				e.preventDefault();
 				gotoSection(1, 1);
 			});
+
+			// Color del logo (ver <header> más arriba): el wordmark usa un
+			// azul marino oscuro que se funde con el fondo negro de la
+			// diapositiva 2 -el check/degradado no lleva la clase
+			// "logo-mark-fill", así que no le afecta-. "data-slide" en
+			// <body> es la única señal que necesita el CSS (ver
+			// global.css) para decidir el color; mismo patrón que ya usa
+			// "modal-open" para el modal de la diapositiva 2.
+			window.addEventListener('slide:enter', ((e: CustomEvent<{ index: number }>) => {
+				document.body.dataset.slide = String(e.detail.index);
+			}) as EventListener);
 
 			// Muestra la primera diapositiva al cargar la página.
 			gotoSection(0, 1);

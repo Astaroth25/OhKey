@@ -1,4 +1,6 @@
 ---
+import Mecanografiado from './Mecanografiado.astro';
+
 // Hero interactivo con tarjetas arrastrables, adaptado de la plantilla
 // de Webflow "GSAP Draggable Website Template":
 // https://webflow.com/templates/html/gsap-draggable-website-template
@@ -19,10 +21,10 @@
 // parte de la MISMA timeline de la transición, no esta diapositiva por
 // su cuenta.
 
-// Sin fotos propias todavía: cada tarjeta usa una imagen de referencia
-// (picsum.photos, con semilla fija para que no cambie en cada recarga) solo
-// para ver el layout con una foto completa. Sustituye "img" por la tuya
-// cuando la tengas; el resto de la tarjeta no depende de que sea un
+// Sin fotos propias todavía: cada tarjeta usa una foto libre de Unsplash,
+// elegida por tema (pautaje, estrategia, código, videollamada) solo para ver
+// el layout con una foto completa y acorde al contenido. Sustituye "img" por
+// la tuya cuando la tengas; el resto de la tarjeta no depende de que sea un
 // placeholder.
 //
 // "tag"/"highlights"/"cta" alimentan el contenido del modal de información
@@ -31,99 +33,76 @@
 // "tagClass"/"ctaClass"/"iconClass" son clases de Tailwind completas (no
 // construidas por interpolación) para que el escáner de Tailwind las
 // detecte en este archivo: cada tarjeta trae su propio color de marca, con
-// texto oscuro en vez de blanco para "Resultados" (bg-brand-200, claro) y
-// un tono más claro que el fondo para el icono de "Cursos" (bg-brand-800,
-// demasiado oscuro para verse bien como simple trazo de 1.4px).
+// texto oscuro en vez de blanco para "Cursos y formación" (bg-brand-200,
+// claro) y un tono más claro que el fondo para el icono de "Desarrollo de
+// Software" (bg-brand-800, demasiado oscuro para verse bien como simple
+// trazo de 1.4px).
 const cards = [
 	{
+		key: 'pautaje',
 		modifier: 'is-first',
 		color: 'bg-brand-400',
-		img: 'https://picsum.photos/seed/ohkey-wappo/600/700',
-		title: 'Wappo CRM: Tu WhatsApp, potenciado.',
+		img: 'https://images.unsplash.com/photo-1759215524472-1b0686fdbd87?w=600&h=700&fit=crop&q=80&auto=format',
+		title: 'Pautaje y contenido para redes',
 		description:
-			'Centraliza tu atención al cliente. Gestiona conversaciones con múltiples agentes desde un solo número de WhatsApp Business: automatiza respuestas, lanza campañas y mide tus métricas clave sin que un mensaje se quede sin convertir.',
-		tag: 'Producto',
-		highlights: [
-			'Multiagente en un solo número de WhatsApp',
-			'Respuestas y campañas automatizadas',
-			'Métricas claras de cada conversación',
-		],
-		cta: 'Probar Wappo CRM',
+			'Pauta inteligente y contenido que convierte en las plataformas donde ya está tu cliente: Meta Ads, Google Ads y TikTok Ads. Campañas optimizadas para generar resultados reales, no solo alcance.',
+		tag: 'Pautaje',
+		highlights: ['Meta Ads: Facebook e Instagram', 'Google Ads: búsqueda y display', 'TikTok Ads: contenido que conecta'],
+		cta: 'Quiero pautar mis redes',
+		whatsapp: 'Hola, quiero pautar mis redes con OhKey. Me interesa info sobre Meta Ads, Google Ads y TikTok Ads para mi negocio.',
 		tagClass: 'bg-brand-400 text-white',
 		ctaClass: 'bg-brand-400 text-white shadow-lg shadow-brand-400/30',
 		iconClass: 'text-brand-400',
 	},
 	{
+		key: 'asesoria',
 		modifier: 'is-second',
 		color: 'bg-brand-600',
-		img: 'https://picsum.photos/seed/ohkey-estrategia/600/700',
+		img: 'https://images.unsplash.com/photo-1533749871411-5e21e14bcc7d?w=600&h=700&fit=crop&q=80&auto=format',
 		title: 'Asesoría estratégica',
 		description:
-			'¿Quieres mayor presencia digital y elevar tus ventas, pero no sabes por dónde empezar? Diseñamos estrategias a medida con objetivos claros: avance medible, precios transparentes y un asesor experto que sabe que cada dólar cuenta para tu crecimiento.',
+			'Estrategia hecha para tu negocio, no consejos genéricos que puedes encontrar en cualquier parte.',
 		tag: 'Asesoría',
-		highlights: [
-			'Estrategia de marketing a tu medida',
-			'Objetivos claros y avance medible',
-			'Precios transparentes, sin sorpresas',
-		],
+		highlights: ['Estrategia a la medida de tu negocio', 'Nada de consejos genéricos', 'Un plan de acción claro y accionable'],
 		cta: 'Agendar asesoría',
+		whatsapp: 'Hola, quiero agendar una asesoría estratégica para mi negocio. ¿Qué disponibilidad tienen?',
 		tagClass: 'bg-brand-600 text-white',
 		ctaClass: 'bg-brand-600 text-white shadow-lg shadow-brand-600/30',
 		iconClass: 'text-brand-600',
 	},
 	{
+		key: 'desarrollo',
 		modifier: 'is-third',
 		color: 'bg-brand-800',
-		img: 'https://picsum.photos/seed/ohkey-cursos/600/700',
-		title: 'Cursos y formación',
-		description:
-			'Construye bases sólidas para dominar el entorno digital. Diseñado para emprendedores y estudiantes, nuestra plataforma te ofrece clases en vivo y pregrabadas: estrategias prácticas, aplicables desde el primer día en tu negocio o tu carrera.',
-		tag: 'Formación',
-		highlights: [
-			'Clases en vivo y pregrabadas',
-			'Estrategias aplicables desde el día 1',
-			'Pensado para emprendedores y estudiantes',
-		],
-		cta: 'Ver cursos disponibles',
+		img: 'https://images.unsplash.com/photo-1607799279861-4dd421887fb3?w=600&h=700&fit=crop&q=80&auto=format',
+		title: 'Desarrollo de Software',
+		description: 'Webs, aplicaciones y automatización con IA.',
+		tag: 'Desarrollo',
+		highlights: ['Sitios web a tu medida', 'Aplicaciones a tu medida', 'Automatización de procesos con IA'],
+		cta: 'Cotizar mi proyecto',
+		whatsapp: 'Hola, quiero cotizar un proyecto de desarrollo (web, app o automatización). ¿Podrían darme más información?',
 		tagClass: 'bg-brand-800 text-white',
 		ctaClass: 'bg-brand-800 text-white shadow-lg shadow-brand-800/40',
 		iconClass: 'text-brand-400',
 	},
 	{
+		key: 'cursos',
 		modifier: 'is-fourth',
 		color: 'bg-brand-200',
-		img: 'https://picsum.photos/seed/ohkey-resultados/600/700',
-		title: 'Resultados que hablan por sí solos',
+		img: 'https://images.unsplash.com/photo-1760346546839-aced24accdff?w=600&h=700&fit=crop&q=80&auto=format',
+		title: 'Cursos y formación',
 		description:
-			'No solo prometemos crecimiento, lo demostramos. Explora las historias de marcas y emprendedores que ya transformaron su presencia digital y aumentaron sus ventas trabajando de la mano con nosotros.',
-		tag: 'Casos de éxito',
-		highlights: [
-			'Marcas que ya transformamos con nosotros',
-			'Crecimiento medible, no promesas vacías',
-			'Historias reales de negocios en crecimiento',
-		],
-		cta: 'Ver casos de éxito',
+			'Marketing digital, publicidad, AI y mucho más. Contenido actualizado 100% online, no pregrabado.',
+		tag: 'Formación',
+		highlights: ['Marketing digital, publicidad y AI', 'Contenido siempre actualizado', '100% online y en vivo, no pregrabado'],
+		cta: 'Ver cursos disponibles',
+		// shortcut: todavía no hay página/calendario real de cursos, así que
+		// esta tarjeta manda a WhatsApp igual que las otras 3 en vez de a un
+		// link propio; cuando exista ese destino real, cambia esto por su URL.
+		whatsapp: 'Hola, quiero más información sobre los cursos y la formación de OhKey (marketing digital, publicidad y AI).',
 		tagClass: 'bg-brand-200 text-brand-950',
 		ctaClass: 'bg-brand-200 text-brand-950 shadow-lg shadow-brand-200/30',
 		iconClass: 'text-brand-200',
-	},
-	{
-		modifier: 'is-fifth',
-		color: 'bg-brand-950',
-		img: 'https://picsum.photos/seed/ohkey-comunidad/600/700',
-		title: 'Únete a la comunidad OhKey',
-		description:
-			'El marketing digital cambia todos los días y queremos mantenerte un paso adelante. Síguenos en nuestras redes sociales para recibir tips, noticias y estrategias que puedes aplicar hoy mismo. ¡Ayúdanos a seguir haciendo crecer esta comunidad!',
-		tag: 'Comunidad',
-		highlights: [
-			'Tips y noticias para ir un paso adelante',
-			'Estrategias que puedes aplicar hoy mismo',
-			'Una comunidad que crece contigo',
-		],
-		cta: 'Unirme a la comunidad',
-		tagClass: 'bg-brand-950 text-white',
-		ctaClass: 'bg-brand-950 text-white shadow-lg shadow-brand-950/50',
-		iconClass: 'text-brand-400',
 	},
 ];
 ---
@@ -136,7 +115,7 @@ const cards = [
 		colapsaba a 0x0-. "w-full" fija ese ancho al 100% de "hero-home" (que
 		si es definido, viene del tamaño real de la diapositiva).
 	-->
-	<div class="hero-heading relative z-0 flex w-full max-w-xl flex-col items-center gap-6 px-6 text-center">
+	<div class="hero-heading relative z-0 flex w-full max-w-xl flex-col items-center gap-10 px-6 text-center">
 		<!--
 			Composición a medida (ver /public/diapositiva_2.svg): misma técnica
 			que el <h1> de la diapositiva 1 -grid de 2 columnas, SVG con
@@ -283,33 +262,56 @@ const cards = [
 				</div>
 			</div>
 		</h2>
+
+		<p class="max-w-2xl text-lg font-normal text-white sm:text-xl" data-mecanografiado="soluciones">
+			<Mecanografiado
+				segmentos={[
+					{ texto: 'Tu negocio no necesita de todo. ' },
+					{ texto: 'Necesita lo correcto,', negrita: true },
+					{ texto: ' en el momento adecuado y con una estrategia detrás.' },
+				]}
+			/>
+		</p>
 	</div>
 
 	<!--
-		"is-first" (Wappo CRM) es la única tarjeta con el aviso de "ver
-		detalles" (más abajo, dentro de este mismo ".map"): es la de arriba
-		del stack y, por el orden invertido con el que "revealCards" anima el
-		array (ver el bloque de comentarios junto a esa función más abajo),
-		la ÚLTIMA en terminar de entrar. Arranca en "opacity-0" -"gsap.set" la
-		reafirma en cada visita a la diapositiva, igual que "cards"/
-		"dragHint"- y la muestra "showLastCardNote", llamada desde el
-		"onComplete" de "revealCards", así que sale justo al terminar esa
-		animación, no antes. Los 2 SVG de icono son fijos -clic para mouse
-		fino, ondas para pantalla táctil-: el script solo oculta el que no
-		aplica y cambia el texto, sin tocar el "path"/"circle" del que se
-		queda.
+		Las 4 tarjetas llevan el aviso de "ver detalles" (más abajo, dentro de
+		este mismo ".map"). Arranca en "opacity-0" -"gsap.set" lo reafirma en
+		cada visita a la diapositiva, igual que "cards"/"dragHint"- y lo
+		muestra "showCardNotes", llamada desde el "onComplete" de
+		"revealCards", así que sale justo al terminar esa animación, no
+		antes. Los 2 SVG de icono son fijos -clic para mouse fino, ondas para
+		pantalla táctil-: el script solo oculta el que no aplica y cambia el
+		texto, sin tocar el "path"/"circle" del que se queda.
 	-->
+	<div class="sr-only">
+		<h3>Nuestros servicios</h3>
+		{cards.map((card) => (
+			<article>
+				<h4>{card.title}</h4>
+				<p>{card.description}</p>
+				<ul>
+					{card.highlights.map((highlight) => (
+						<li>{highlight}</li>
+					))}
+				</ul>
+			</article>
+		))}
+	</div>
+
 	{
 		cards.map((card) => (
 			<div
 				class:list={['draggable-card', card.modifier, card.color]}
 				data-draggable-card
+				data-card-key={card.key}
 				data-card-title={card.title}
 				data-card-description={card.description}
 				data-card-img={card.img}
 				data-card-tag={card.tag}
 				data-card-tag-class={card.tagClass}
 				data-card-cta={card.cta}
+				data-card-whatsapp={card.whatsapp}
 				data-card-cta-class={card.ctaClass}
 				data-card-icon-class={card.iconClass}
 				data-card-highlights={JSON.stringify(card.highlights)}
@@ -327,47 +329,45 @@ const cards = [
 				<span class="pointer-events-none absolute right-0 bottom-0 left-0 px-4 pb-4 text-center text-xs font-semibold tracking-widest text-white uppercase">
 					{card.title}
 				</span>
-				{card.modifier === 'is-first' && (
-					<div
-						class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/75 px-6 text-center text-white opacity-0"
-						data-card-note
+				<div
+					class="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/75 px-6 text-center text-white opacity-0"
+					data-card-note
+				>
+					<svg
+						class="h-6 w-6 sm:h-7 sm:w-7"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.6"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
+						data-card-note-icon-fine
 					>
-						<svg
-							class="h-6 w-6 sm:h-7 sm:w-7"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="1.6"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							aria-hidden="true"
-							data-card-note-icon-fine
-						>
-							<path d="M5.2 3.4l14.1 6.1-6.1 2.2-2.2 6.1-5.8-14.4z" />
-						</svg>
-						<svg
-							class="hidden h-6 w-6 sm:h-7 sm:w-7"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="1.6"
-							aria-hidden="true"
-							data-card-note-icon-coarse
-						>
-							<circle cx="12" cy="12" r="2.1" fill="currentColor" stroke="none" />
-							<circle cx="12" cy="12" r="6.2" opacity="0.85" />
-							<circle cx="12" cy="12" r="9.8" opacity="0.45" />
-						</svg>
-						<span class="text-xs font-semibold leading-snug sm:text-sm" data-card-note-text>Click para ver los detalles</span>
-					</div>
-				)}
+						<path d="M5.2 3.4l14.1 6.1-6.1 2.2-2.2 6.1-5.8-14.4z" />
+					</svg>
+					<svg
+						class="hidden h-6 w-6 sm:h-7 sm:w-7"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.6"
+						aria-hidden="true"
+						data-card-note-icon-coarse
+					>
+						<circle cx="12" cy="12" r="2.1" fill="currentColor" stroke="none" />
+						<circle cx="12" cy="12" r="6.2" opacity="0.85" />
+						<circle cx="12" cy="12" r="9.8" opacity="0.45" />
+					</svg>
+					<span class="text-xs font-semibold leading-snug sm:text-sm" data-card-note-text>Click para ver los detalles</span>
+				</div>
 			</div>
 		))
 	}
 
 	<!--
 		Modal de información de la tarjeta. Un único overlay reutilizado por
-		las 5 tarjetas: se rellena con el contenido de la que se tocó (foto,
+		las 4 tarjetas: se rellena con el contenido de la que se tocó (foto,
 		etiqueta de categoría, título, descripción, 3 puntos destacados y
 		botón de acción) y se muestra a pantalla completa en móvil o como
 		cuadro grande con el fondo difuminado en pantallas más anchas.
@@ -403,7 +403,7 @@ const cards = [
 
 				<button
 					type="button"
-					class="absolute top-5 right-5 flex h-10 w-10 items-center justify-center rounded-full bg-black/45 text-white transition-colors hover:bg-black/60"
+					class="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/45 text-white transition-colors hover:bg-black/60"
 					data-card-modal-close
 					aria-label="Cerrar"
 				>
@@ -486,7 +486,7 @@ const cards = [
 	-->
 	<button
 		type="button"
-		class="drag-hint absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full bg-white/10 px-4 py-2 text-xs tracking-widest text-white/70 uppercase backdrop-blur"
+		class="drag-hint absolute bottom-12 left-1/2 z-20 -translate-x-1/2 rounded-full bg-white/10 px-4 py-2 text-xs tracking-widest text-white/70 uppercase backdrop-blur"
 	>
 		Arrastra las tarjetas
 	</button>
@@ -550,16 +550,6 @@ const cards = [
 		z-index: 4;
 	}
 
-	.draggable-card.is-fifth {
-		z-index: 3;
-		transform: rotate(2deg);
-	}
-
-	.draggable-card.is-sixth {
-		z-index: 2;
-		transform: rotate(-6deg);
-	}
-
 	.draggable-card {
 		cursor: pointer;
 	}
@@ -598,6 +588,7 @@ const cards = [
 	import gsap from 'gsap';
 	import { Draggable } from 'gsap/Draggable';
 	import { InertiaPlugin } from 'gsap/InertiaPlugin';
+	import { WHATSAPP_NUMBER } from '../lib/whatsapp';
 
 	gsap.registerPlugin(Draggable, InertiaPlugin);
 
@@ -613,25 +604,27 @@ const cards = [
 
 		const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 		const canUseCursor = hasFinePointer && cursor && cursorDefault && cursorHover && cursorGrab;
+		const esEscritorio = window.matchMedia('(min-width: 1280px)').matches;
 
-		// Aviso de "ver detalles" de la última tarjeta en entrar (ver el
-		// comentario junto a "data-card-note" en el marcado de arriba y
-		// "showLastCardNote" más abajo). El texto por defecto en el marcado
-		// ("Click para ver los detalles") ya sirve para mouse fino: en
-		// pantalla táctil solo hace falta cambiar el texto y qué icono
-		// queda oculto, no reconstruir el elemento.
-		const lastCardNote = heroHome.querySelector<HTMLElement>('[data-card-note]');
-		const lastCardNoteText = lastCardNote?.querySelector<HTMLElement>('[data-card-note-text]');
-		const lastCardNoteIconCoarse = lastCardNote?.querySelector<SVGElement>('[data-card-note-icon-coarse]');
-		if (lastCardNoteText && !hasFinePointer) {
-			lastCardNoteText.textContent = 'Toca para ver los detalles';
-			lastCardNote?.querySelector('[data-card-note-icon-fine]')?.classList.add('hidden');
-			lastCardNoteIconCoarse?.classList.remove('hidden');
+		// Aviso de "ver detalles" en las 4 tarjetas (ver el comentario junto
+		// a "data-card-note" en el marcado de arriba y "showCardNotes" más
+		// abajo). El texto por defecto en el marcado ("Click para ver los
+		// detalles") ya sirve para mouse fino: en pantalla táctil solo hace
+		// falta cambiar el texto y qué icono queda oculto, no reconstruir
+		// el elemento.
+		const cardNotes = gsap.utils.toArray<HTMLElement>('[data-card-note]', heroHome);
+		if (!hasFinePointer) {
+			cardNotes.forEach((note) => {
+				const text = note.querySelector<HTMLElement>('[data-card-note-text]');
+				if (text) text.textContent = 'Toca para ver los detalles';
+				note.querySelector('[data-card-note-icon-fine]')?.classList.add('hidden');
+				note.querySelector('[data-card-note-icon-coarse]')?.classList.remove('hidden');
+			});
 		}
 
 		// Modal de información: pantalla completa en móvil, cuadro grande
 		// con el resto difuminado en pantallas anchas (ver <style> arriba).
-		// Se reutiliza un único overlay para las 5 tarjetas.
+		// Se reutiliza un único overlay para las 4 tarjetas.
 		const modal = heroHome.querySelector<HTMLElement>('[data-card-modal]');
 		const modalPanel = modal?.querySelector<HTMLElement>('.card-modal__panel');
 		const modalBackdrop = modal?.querySelector<HTMLElement>('[data-card-modal-backdrop]');
@@ -647,6 +640,7 @@ const cards = [
 			? gsap.utils.toArray<SVGElement>('[data-card-modal-highlight-icon]', modal)
 			: [];
 		const modalCta = modal?.querySelector<HTMLAnchorElement>('[data-card-modal-cta]');
+		const brandChrome = gsap.utils.toArray<HTMLElement>('[data-brand-chrome]');
 
 		// Clases de color que SÍ cambian por tarjeta (ver "tagClass"/"ctaClass"/
 		// "iconClass" en el array "cards" de más arriba): el resto de clases de
@@ -679,6 +673,17 @@ const cards = [
 			modalCta.textContent = card.dataset.cardCta ?? '';
 			modalCta.className = `${modalCtaBaseClass} ${card.dataset.cardCtaClass ?? ''}`.trim();
 
+			const mensajeWhatsapp = card.dataset.cardWhatsapp;
+			if (mensajeWhatsapp) {
+				modalCta.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensajeWhatsapp)}`;
+				modalCta.target = '_blank';
+				modalCta.rel = 'noopener noreferrer';
+			} else {
+				modalCta.href = '#';
+				modalCta.removeAttribute('target');
+				modalCta.removeAttribute('rel');
+			}
+
 			const highlights: string[] = card.dataset.cardHighlights ? JSON.parse(card.dataset.cardHighlights) : [];
 			modalHighlightTexts.forEach((el, i) => {
 				el.textContent = highlights[i] ?? '';
@@ -692,9 +697,10 @@ const cards = [
 			modal.style.pointerEvents = 'auto';
 			modal.setAttribute('aria-hidden', 'false');
 			modal.removeAttribute('inert');
+			cards.forEach((otherCard) => otherCard.setAttribute('inert', ''));
 			document.body.classList.add('modal-open');
 
-			gsap.killTweensOf([modal, modalPanel, modalBackdrop]);
+			gsap.killTweensOf([modal, modalPanel, modalBackdrop, ...brandChrome]);
 			gsap.set(modal, { autoAlpha: 1 });
 
 			// "Morph" desde la tarjeta pulsada (técnica FLIP): el panel
@@ -718,6 +724,7 @@ const cards = [
 				{ x: 0, y: 0, scaleX: 1, scaleY: 1, autoAlpha: 1, duration: 0.5, ease: 'back.out(1.4)' },
 			);
 			gsap.fromTo(modalBackdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' });
+			if (brandChrome.length > 0) gsap.to(brandChrome, { autoAlpha: 0, duration: 0.5, ease: 'power2.out' });
 		}
 
 		function closeCardModal(): void {
@@ -726,8 +733,9 @@ const cards = [
 			modalOpen = false;
 			document.body.classList.remove('modal-open');
 
-			gsap.killTweensOf([modal, modalPanel, modalBackdrop]);
+			gsap.killTweensOf([modal, modalPanel, modalBackdrop, ...brandChrome]);
 			gsap.to(modalBackdrop, { autoAlpha: 0, duration: 0.3, ease: 'power2.in' });
+			if (brandChrome.length > 0) gsap.to(brandChrome, { autoAlpha: 1, duration: 0.3, ease: 'power2.in' });
 
 			const onClosed = (): void => {
 				if (!modal || !modalPanel) return;
@@ -740,6 +748,8 @@ const cards = [
 				// que retiene el foco, mal para lectores de pantalla). Se
 				// devuelve el foco a la tarjeta que abrió el modal, el
 				// patrón habitual al cerrar un diálogo.
+				cards.forEach((otherCard) => otherCard.removeAttribute('inert'));
+
 				if (modal.contains(document.activeElement)) {
 					activeCard?.focus();
 				}
@@ -880,8 +890,28 @@ const cards = [
 		// tiempo-; "revealCards" las anima y la llama el propio timeline de
 		// "playTituloIntro" cuando termina, así que las tarjetas SIEMPRE entran
 		// justo después del titular, sin importar cuánto dure.
+		const posicionesEscritorio: Record<string, { x: number; y: number }> = {
+			pautaje: { x: -470, y: -170 },
+			desarrollo: { x: -470, y: 170 },
+			asesoria: { x: 470, y: -170 },
+			cursos: { x: 470, y: 170 },
+		};
+
 		function hideCards(dFactor: 1 | -1): void {
-			gsap.set(cards, { autoAlpha: 0, yPercent: 120 * dFactor, scale: 0.85 });
+			if (esEscritorio) {
+				cards.forEach((card) => {
+					const posicion = posicionesEscritorio[card.dataset.cardKey ?? ''];
+					if (!posicion) return;
+					gsap.set(card, {
+						autoAlpha: 0,
+						x: posicion.x,
+						y: posicion.y + 150 * dFactor,
+						scale: 0.85,
+					});
+				});
+			} else {
+				gsap.set(cards, { autoAlpha: 0, yPercent: 120 * dFactor, scale: 0.85 });
+			}
 			// La píldora "Arrastra las tarjetas" espera a que las tarjetas
 			// terminen de entrar (ver "onComplete" en "revealCards"): sin
 			// esto se vería desde el principio, antes de que hubiera nada
@@ -890,23 +920,44 @@ const cards = [
 			// Mismo motivo que "dragHint": sin resetear aquí, una segunda
 			// visita a la diapositiva la encontraría ya visible (o a medio
 			// desvanecer) en vez de arrancar oculta como la primera vez.
-			if (lastCardNote) gsap.set(lastCardNote, { autoAlpha: 0 });
+			if (cardNotes.length) gsap.set(cardNotes, { autoAlpha: 0 });
 		}
 
 		// 0.25s de entrada + 1.5s ya bien visible + 0.25s de salida: los
 		// "1.5s" pedidos son el tiempo LEÍBLE del aviso, no el ciclo
 		// completo. El "delay" del segundo ".to" es lo que crea ese hueco
 		// fijo en el medio sin necesitar un tercer tween solo para esperar.
-		function showLastCardNote(): void {
-			if (!lastCardNote) return;
+		function showCardNotes(): void {
+			if (cardNotes.length === 0) return;
 
 			gsap
 				.timeline()
-				.to(lastCardNote, { autoAlpha: 1, duration: 0.25 })
-				.to(lastCardNote, { autoAlpha: 0, duration: 0.25, delay: 1.5 });
+				.to(cardNotes, { autoAlpha: 1, duration: 0.25 })
+				.to(cardNotes, { autoAlpha: 0, duration: 0.25, delay: 1.5 });
 		}
 
+		const ordenEscritorio = ['pautaje', 'desarrollo', 'asesoria', 'cursos']
+			.map((key) => cards.find((card) => card.dataset.cardKey === key))
+			.filter((card): card is HTMLElement => Boolean(card));
+
 		function revealCards(): void {
+			if (esEscritorio) {
+				gsap.to(ordenEscritorio, {
+					autoAlpha: 1,
+					scale: 1,
+					x: (_i, target: HTMLElement) => posicionesEscritorio[target.dataset.cardKey ?? '']?.x ?? 0,
+					y: (_i, target: HTMLElement) => posicionesEscritorio[target.dataset.cardKey ?? '']?.y ?? 0,
+					duration: 0.4,
+					ease: 'back.out(1.7)',
+					stagger: 0.15,
+					onComplete: () => {
+						if (dragHint) gsap.to(dragHint, { autoAlpha: 1, yPercent: 0, duration: 0.4, ease: 'power2.out' });
+						showCardNotes();
+					},
+				});
+				return;
+			}
+
 			gsap.to([...cards].reverse(), {
 				autoAlpha: 1,
 				yPercent: 0,
@@ -916,7 +967,7 @@ const cards = [
 				stagger: 0.4,
 				onComplete: () => {
 					if (dragHint) gsap.to(dragHint, { autoAlpha: 1, yPercent: 0, duration: 0.4, ease: 'power2.out' });
-					showLastCardNote();
+					showCardNotes();
 				},
 			});
 		}
@@ -928,13 +979,51 @@ const cards = [
 		const disenadasEl = heroHome.querySelector<SVGElement>('[data-titulo-parte="diseñadas"]');
 		const paraEl = heroHome.querySelector<SVGElement>('[data-titulo-parte="para"]');
 
+		const parrafoSoluciones = heroHome.querySelector<HTMLElement>('[data-mecanografiado="soluciones"]');
+		const caracteresSoluciones = parrafoSoluciones
+			? gsap.utils.toArray<HTMLElement>('.caracter', parrafoSoluciones)
+			: [];
+		const cursorSoluciones = parrafoSoluciones?.querySelector<HTMLElement>('[data-cursor-mecanografiado]') ?? null;
+		const PASO_MECANOGRAFIADO = 0.032;
+		const PAUSA_ANTES_DE_ESCRIBIR = 0.6;
+
+		// La entrada del título, el mecanografiado y la aparición de las
+		// tarjetas solo se ven la primera vez que se visita esta diapositiva
+		// (ver el mismo mecanismo en index.astro): en visitas siguientes
+		// resultan pesadas de esperar para quien ya las vio, así que
+		// directamente se deja todo en su estado final sin animar nada -las
+		// tarjetas se quedan donde el usuario las haya dejado, no se
+		// reordenan ni se ocultan de nuevo-.
+		let yaAnimadoSoluciones = false;
+		let tlSolucionesActual: gsap.core.Timeline | null = null;
+
 		// "delay: 0.5" -igual que en el <h1> de la diapositiva 1- espera a
 		// que el barrido de la diapositiva despeje pantalla antes de
 		// arrancar. Sin parámetro de posición en los ".to": cada uno se
 		// encadena al final del anterior, así que el orden en que se
 		// escriben es el orden en que se ven, sin solaparse.
-		function playTituloIntro(): void {
+		function playTituloIntro(direction: 1 | -1): void {
 			if (!solucionesEl || !tuEl || !negocioEl || !escalarEl || !disenadasEl || !paraEl) return;
+
+			if (yaAnimadoSoluciones) {
+				tlSolucionesActual?.kill();
+				gsap.set([solucionesEl, tuEl, negocioEl, escalarEl, disenadasEl, paraEl], {
+					autoAlpha: 1,
+					xPercent: 0,
+					yPercent: 0,
+					rotation: 0,
+					scale: 1,
+				});
+				gsap.set(caracteresSoluciones, { visibility: 'visible' });
+				if (cursorSoluciones && parrafoSoluciones) {
+					gsap.set(cursorSoluciones, { autoAlpha: 1 });
+					parrafoSoluciones.append(cursorSoluciones);
+				}
+				return;
+			}
+
+			yaAnimadoSoluciones = true;
+			hideCards(direction);
 
 			gsap.set(solucionesEl, { autoAlpha: 0, xPercent: -60, rotation: -10 });
 			gsap.set(tuEl, { autoAlpha: 0, scale: 0.5 });
@@ -944,22 +1033,33 @@ const cards = [
 			// "filaCentral" en index.astro): grupo con "autoAlpha"+"yPercent"+
 			// "scale" animado de una vez con "stagger", no 2 tweens seguidos.
 			gsap.set([disenadasEl, paraEl], { autoAlpha: 0, yPercent: 70, scale: 0.5 });
+			if (cursorSoluciones && parrafoSoluciones) parrafoSoluciones.prepend(cursorSoluciones);
+			if (cursorSoluciones) gsap.set(cursorSoluciones, { autoAlpha: 0 });
+			gsap.set(caracteresSoluciones, { visibility: 'hidden' });
 
 			const tl = gsap.timeline({ delay: 0.5, defaults: { ease: 'back.out(1.7)' } });
+			tlSolucionesActual = tl;
 
 			tl.to(solucionesEl, { autoAlpha: 1, xPercent: 0, rotation: 0, duration: 0.45 })
 				.to([disenadasEl, paraEl], { autoAlpha: 1, yPercent: 0, scale: 1, duration: 0.35, stagger: 0.15 })
 				.to(escalarEl, { autoAlpha: 1, xPercent: 0, rotation: 0, duration: 0.45 })
 				.to(tuEl, { autoAlpha: 1, scale: 1, duration: 0.4 })
-				.to(negocioEl, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.4 })
-				.call(revealCards);
+				.to(negocioEl, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.4 });
+
+			if (cursorSoluciones) tl.set(cursorSoluciones, { autoAlpha: 1 });
+			tl.to({}, { duration: PAUSA_ANTES_DE_ESCRIBIR });
+
+			caracteresSoluciones.forEach((caracter) => {
+				tl.set(caracter, { visibility: 'visible' }, `+=${PASO_MECANOGRAFIADO}`).call(() => {
+					if (cursorSoluciones) caracter.insertAdjacentElement('afterend', cursorSoluciones);
+				});
+			});
+
+			tl.call(revealCards);
 		}
 
 		window.addEventListener('slide:enter', ((e: CustomEvent<{ index: number; direction: 1 | -1 }>) => {
-			if (e.detail.index === 1) {
-				hideCards(e.detail.direction);
-				playTituloIntro();
-			}
+			if (e.detail.index === 1) playTituloIntro(e.detail.direction);
 		}) as EventListener);
 	}
 </script>
